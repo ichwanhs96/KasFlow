@@ -1,6 +1,6 @@
 # KasFlow demo: voice-over script
 
-Read this over `video/kasflow-demo.mp4` (3:20). Each part starts when its on-screen caption appears.
+Read this over `video/kasflow-demo.mp4` (3:37). Each part starts when its on-screen caption appears.
 
 - **Pace:** calm, about 140 words per minute. Each part fits its scene with a little breathing room.
 - **Pauses:** `/` marks a short pause.
@@ -18,9 +18,10 @@ Read this over `video/kasflow-demo.mp4` (3:20). Each part starts when its on-scr
 | 8 | 1:35–1:50 | Sources panel; bank source expanded |
 | 9 | 1:50–2:20 | Score, metrics, chart, AI summary, customer explanation |
 | 10 | 2:20–2:29 | Analyst review submitted |
-| 11 | 2:29–2:47 | Linh: tamper flags, unfavorable |
-| 12 | 2:47–3:01 | API docs |
-| 13 | 3:01–3:20 | Outro card |
+| 11 | 2:29–2:45 | Linh: tamper flags, unfavorable |
+| 12 | 2:45–2:59 | API docs |
+| 13 | 2:59–3:17 | Cost per assessment |
+| 14 | 3:17–3:37 | Outro card |
 
 ---
 
@@ -54,13 +55,16 @@ Read this over `video/kasflow-demo.mp4` (3:20). Each part starts when its on-scr
 ### 10. Review (2:20–2:29)
 > A human makes the final call. / The analyst accepts or overrides, / and every step is recorded in the audit trail.
 
-### 11. Tampering (2:29–2:47)
+### 11. Tampering (2:29–2:45)
 > Now Linh, an online shop owner in Vietnam. / She uploaded a bank statement with inflated amounts. / KasFlow checks the running balance on every row, / and the arithmetic doesn't add up. / Two rows are flagged, and the assessment comes back unfavorable.
 
-### 12. API (2:47–3:01)
+### 12. API (2:45–2:59)
 > Any company can integrate KasFlow, whether lending, BNPL, rental or insurance. / Create an assessment, push extra data, / or embed the hosted collection page. / It's a simple REST API.
 
-### 13. Outro (3:01–3:20)
+### 13. Cost per assessment (2:59–3:17)
+> And it's cheap to run. / Measured live, an assessment costs about a fifth of a cent when open-finance data is enough, / under one cent with uploads and a camera photo, / and under two cents for a long bank statement. / *[The scoring itself is plain Python, so there's no AI cost there.]*
+
+### 14. Outro (3:17–3:37)
 > KasFlow: open finance first, any data as fallback, even paper. / Deterministic, explainable scores, with AI that reads and explains. / Built on Gemini, Cloud Run, Firestore and Firebase. / Credit signals from any data.
 
 ---

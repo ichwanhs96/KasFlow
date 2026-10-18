@@ -123,9 +123,9 @@ def test_daily_cap_resets_at_utc_midnight():
     assert cap.try_acquire()
 
 
-def test_settings_default_daily_cap_is_150(monkeypatch):
+def test_settings_default_daily_cap_is_50(monkeypatch):
     monkeypatch.delenv("GEMINI_DAILY_CAP", raising=False)
-    assert Settings().gemini_daily_cap == 150 and load_settings().gemini_daily_cap == 150
+    assert Settings().gemini_daily_cap == 50 and load_settings().gemini_daily_cap == 50
     monkeypatch.setenv("GEMINI_DAILY_CAP", "40")
     assert load_settings().gemini_daily_cap == 40
 

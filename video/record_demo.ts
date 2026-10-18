@@ -140,7 +140,11 @@ async function main() {
   await pause(3_000);
   for (let i = 0; i < 4; i++) { await page.mouse.wheel(0, 350); await pause(1_200); }
 
-  // 12 Outro
+  // 12 Cost per assessment
+  await go(page, "/demo/cost", "Under 2 US cents per credit assessment, measured live");
+  await pause(10_000);
+
+  // 13 Outro
   await go(page, "/demo/outro", "Built on Gemini · Cloud Run · Firestore · Firebase");
   await pause(12_000);
 

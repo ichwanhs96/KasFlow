@@ -990,6 +990,12 @@ Full-screen 1280×720 slides, made of static HTML. They use a pastel navy-on-lig
   - "SEA financial data is scattered across banks, e-wallets, QRIS — and paper"
   - "Lending, BNPL, rental & insurance all need the same answer: can this customer afford it?"
 
+**Cost slide** (`/demo/cost`):
+- A table of measured cost per assessment for each persona: Gemini calls, tokens in and out, and cost ($0.002 / $0.009 / $0.017).
+- An infrastructure row: under $0.001.
+- A headline: "1–2 US cents per customer".
+- The pricing basis: Gemini 2.5 Flash on Vertex AI at $0.30 / $2.50 per 1M tokens.
+
 **Outro slide:**
 - An architecture diagram (inline SVG boxes): Client app → KasFlow API (Cloud Run) → Firestore / Gemini, plus Firebase Hosting and Auth.
 - Three bullets: "Open finance first, any data as fallback", "Deterministic, explainable scores; AI reads and explains", "Embed in a day: API + hosted collection page".
@@ -1111,7 +1117,7 @@ It is idempotent. `deploy.sh` alone redeploys code changes.
 - **Five Gemini calls per minute:** `RateLimitedGemini` wraps the live Gemini backend with a 60-second sliding window (`GEMINI_RPM`, default 5). With a single instance this is a global limit. When the limit is hit:
   - uploads and pushed JSON return `429 rate_limited` without using up an item;
   - summaries degrade to `summary_failed`, and the analyst can use Regenerate summary.
-- **150 Gemini calls per day:** a daily cap (`GEMINI_DAILY_CAP`, default 150) is checked after the per-minute limit. It's counted in Firestore (`usage/gemini-YYYY-MM-DD`, a transactional increment), so instance restarts don't reset it. It resets at 00:00 UTC. Once reached, uploads return `429 daily_limit_reached`, and the collection page explains it in the customer's language.
+- **50 Gemini calls per day:** a daily cap (`GEMINI_DAILY_CAP`, default 50, about 12 full Sari demos) is checked after the per-minute limit. It's counted in Firestore (`usage/gemini-YYYY-MM-DD`, a transactional increment), so instance restarts don't reset it. It resets at 00:00 UTC. Once reached, uploads return `429 daily_limit_reached`, and the collection page explains it in the customer's language.
 - **No Vertex-side cap:** Gemini 2.5 Flash uses Dynamic Shared Quota, so there's no per-project quota to lower.
 - **Billing shutoff:** `bootstrap.sh` deploys a Pub/Sub-triggered function (`infra/billing_cap`, local-only) that unlinks billing when the budget's cost reaches its amount. The user creates the $10 budget, excludes credits from it, and connects the budget to topic `kasflow-billing-cap`.
 
@@ -1190,7 +1196,8 @@ It is idempotent. `deploy.sh` alone redeploys code changes.
 | 9 | Review | Click Accept and Submit; the review card appears | "Human-in-the-loop decision, fully audited" |
 | 10 | Tamper | Back to the list; open Linh; expand the upload source showing red tampered rows; show **unfavorable** | "Edited PDF? Balance arithmetic exposes tampering" |
 | 11 | API docs | `go(/docs)`, scroll slowly | "Any company integrates via REST API" |
-| 12 | Outro | `go(/demo/outro)`, pause 12 s | "Built on Gemini · Cloud Run · Firestore · Firebase" |
+| 12 | Cost | `go(/demo/cost)`, pause 10 s | "Under 2 US cents per credit assessment, measured live" |
+| 13 | Outro | `go(/demo/outro)`, pause 12 s | "Built on Gemini · Cloud Run · Firestore · Firebase" |
 
 **`stitch.sh`**
 - Converts `out/*.webm` to `kasflow-demo.mp4` (`ffmpeg -i in.webm -c:v libx264 -pix_fmt yuv420p -crf 20`).

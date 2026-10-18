@@ -24,6 +24,7 @@ async function main() {
 
   await shot(page, "intro", "/demo/intro", "h1");
   await shot(page, "outro", "/demo/outro", "svg");
+  await shot(page, "cost", "/demo/cost", "table");
   await shot(page, "signin", "/", "#signin");
   await page.click("#signin");
   await page.waitForURL("**/console**");

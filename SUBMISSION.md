@@ -14,7 +14,7 @@ through running-balance arithmetic. A deterministic engine produces an explainab
 3. An analyst summary in which every point cites a metric, plus an explanation for the customer in Bahasa Indonesia,
    Filipino or Vietnamese.
 
-Gemini never computes the score.
+Gemini never computes the score. Measured live, an assessment costs about US$0.002–0.018, which is 1–2 US cents per customer.
 
 **Cloud Run.** The entire backend — REST API, pipeline and the web UI — runs as one container on Cloud Run that
 scales to zero when idle, so the demo costs nothing between visits.

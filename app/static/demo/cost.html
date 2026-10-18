@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>KasFlow · Cost</title>
+  <link rel="icon" href="/static/img/logo.svg" type="image/svg+xml">
+  <script src="https://cdn.tailwindcss.com"></script></head>
+<body class="min-h-screen flex items-center justify-center p-10" style="background:#F5F7FA;color:#1F2A37;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif">
+  <main class="w-full max-w-5xl bg-white border border-[#D9DEE7]" style="border-top:4px solid #3B6FB6">
+    <div class="px-12 pt-8 pb-9">
+      <div class="flex items-center gap-3">
+        <img src="/static/img/logo.svg" class="w-9 h-9" alt="">
+        <span class="text-2xl font-semibold"><span style="color:#1E3A5F">Kas</span><span style="color:#2E8B62">Flow</span></span>
+      </div>
+      <h1 class="text-4xl font-semibold mt-4" style="color:#1E3A5F">Cost per credit assessment</h1>
+      <p class="mt-1 text-base" style="color:#667085">Measured live on Gemini 2.5 Flash (Vertex AI), October 2026. Scoring is plain Python, so it adds no AI cost.</p>
+      <table class="w-full mt-6 text-lg border-collapse [&_th]:whitespace-nowrap [&_td:not(:first-child)]:whitespace-nowrap" style="font-variant-numeric:tabular-nums">
+        <thead><tr class="text-sm text-left" style="background:#EEF2F7;color:#475467">
+          <th class="py-2 px-3 font-semibold">Scenario</th><th class="py-2 px-3 font-semibold text-right">Gemini calls</th>
+          <th class="py-2 px-3 font-semibold text-right">Tokens in / out</th><th class="py-2 px-3 font-semibold text-right">Cost</th>
+          <th class="py-2 px-3" style="width:15%"></th></tr></thead>
+        <tbody>
+          <tr class="border-b border-[#EEF1F5]"><td class="py-3 px-3"><span class="font-semibold" style="color:#3B6FB6">01</span>&nbsp; Open-finance data is enough <span class="text-sm" style="color:#667085">(Paolo)</span></td>
+            <td class="py-3 px-3 text-right">1</td><td class="py-3 px-3 text-right">1.2k / 0.6k</td><td class="py-3 px-3 text-right font-semibold">$0.002</td>
+            <td class="py-3 px-3"><div class="h-2" style="background:#EEF1F5"><div class="h-2" style="width:11%;background:#8CCFA8"></div></div></td></tr>
+          <tr class="border-b border-[#EEF1F5]"><td class="py-3 px-3"><span class="font-semibold" style="color:#3B6FB6">02</span>&nbsp; Thin file + e-wallet, QRIS &amp; photo <span class="text-sm" style="color:#667085">(Sari)</span></td>
+            <td class="py-3 px-3 text-right">4</td><td class="py-3 px-3 text-right">6.6k / 2.8k</td><td class="py-3 px-3 text-right font-semibold">$0.009</td>
+            <td class="py-3 px-3"><div class="h-2" style="background:#EEF1F5"><div class="h-2" style="width:52%;background:#8CCFA8"></div></div></td></tr>
+          <tr class="border-b border-[#EEF1F5]"><td class="py-3 px-3"><span class="font-semibold" style="color:#3B6FB6">03</span>&nbsp; 62-row bank statement PDF <span class="text-sm" style="color:#667085">(Linh)</span></td>
+            <td class="py-3 px-3 text-right">2</td><td class="py-3 px-3 text-right">2.4k / 6.7k</td><td class="py-3 px-3 text-right font-semibold">$0.017</td>
+            <td class="py-3 px-3"><div class="h-2" style="background:#EEF1F5"><div class="h-2" style="width:100%;background:#F2D9A8"></div></div></td></tr>
+          <tr><td class="py-3 px-3" style="color:#475467">+ Cloud Run &amp; Firestore <span class="text-sm">(scales to zero)</span></td>
+            <td class="py-3 px-3 text-right" style="color:#667085">—</td><td class="py-3 px-3 text-right" style="color:#667085">—</td>
+            <td class="py-3 px-3 text-right font-semibold">&lt; $0.001</td><td></td></tr>
+        </tbody>
+      </table>
+      <div class="mt-6 flex items-baseline gap-4 border-l-4 pl-4" style="border-color:#3FA37A">
+        <span class="text-3xl font-semibold" style="color:#1F6B45">1–2 US cents</span>
+        <span class="text-lg" style="color:#475467">per customer &nbsp;·&nbsp; about Rp 30–300 &nbsp;·&nbsp; 10,000 assessments ≈ US$100</span>
+      </div>
+      <p class="mt-4 text-sm" style="color:#667085">Gemini 2.5 Flash on Vertex AI: $0.30 input / $2.50 output per 1M tokens. Rupiah at ~Rp 16,500 per US$. Large documents cost more because output tokens dominate.</p>
+    </div>
+  </main>
+</body>
+</html>

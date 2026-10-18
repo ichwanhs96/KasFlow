@@ -41,6 +41,11 @@ def demo_intro():
     return _page("demo/intro.html")
 
 
+@router.get("/demo/cost")
+def demo_cost():
+    return _page("demo/cost.html")
+
+
 @router.get("/demo/outro")
 def demo_outro():
     return _page("demo/outro.html")

@@ -44,3 +44,10 @@ def test_collect_page_explains_rate_limit_in_every_language(client):
 def test_collect_page_explains_daily_limit_in_every_language(client):
     assert client.get("/static/js/i18n.js").text.count("daily_limit:") == 4
     assert '"daily_limit_reached"' in client.get("/static/js/collect.js").text
+
+
+def test_cost_slide(client):
+    r = client.get("/demo/cost")
+    assert r.status_code == 200 and "Cost per credit assessment" in r.text
+    for s in ("$0.002", "$0.009", "$0.017", "Gemini 2.5 Flash", "Cloud Run"):
+        assert s in r.text, s

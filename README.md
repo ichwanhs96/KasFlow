@@ -42,9 +42,31 @@ KasFlow runs on Google Cloud:
 - **Vertex AI Gemini:** document extraction, CSV/JSON mapping and explanations.
 - **Firebase Authentication:** Google sign-in for analysts.
 
-Cost guardrails: at most one Cloud Run instance, at most 5 Gemini calls per minute (`GEMINI_RPM`) and 150 per day (`GEMINI_DAILY_CAP`, counted in Firestore), and a budget-triggered billing shutoff.
+Cost guardrails: at most one Cloud Run instance, at most 5 Gemini calls per minute (`GEMINI_RPM`) and 50 per day (`GEMINI_DAILY_CAP`, counted in Firestore), and a budget-triggered billing shutoff.
 
 Production settings: `REPO_BACKEND=firestore`, `GEMINI_BACKEND=vertex`, `AUTH_BACKEND=firebase`, plus the `GOOGLE_CLOUD_*`, `FIREBASE_WEB_*` and demo-key variables listed in `.env.example`.
+
+## Cost per assessment
+Measured live on Gemini 2.5 Flash (Vertex AI) in October 2026, running each demo persona through the real pipeline:
+
+| Scenario | Gemini calls | Tokens in / out | Gemini | Cloud Run + Firestore | Total per customer |
+|---|---|---|---|---|---|
+| Open-finance data is enough (Paolo) | 1: summary | 1.2k / 0.6k | $0.0020 | ~$0.0002 | **~$0.002** |
+| Thin file, then e-wallet screenshot, QRIS CSV and camera photo (Sari) | 4: two image reads, CSV mapping, summary | 6.6k / 2.8k | $0.0091 | ~$0.0007 | **~$0.010** |
+| 62-row bank statement PDF (Linh) | 2: PDF read, summary | 2.4k / 6.7k | $0.0174 | ~$0.0008 | **~$0.018** |
+
+**Where the cost comes from**
+- **Gemini:** $0.30 per 1M input tokens and $2.50 per 1M output tokens. Output dominates, so long statements cost the most; a 62-row PDF writes about 6k tokens.
+- **No AI in the scoring:** merging, de-duplication, the tamper check and the score are plain Python.
+- **Cloud Run** (request-based billing, 1 vCPU / 1 GiB): billed only while a request runs, about 8–30 s per assessment at roughly $0.000027 per second, and $0 when idle.
+- **Firestore:** about 20 reads and writes per assessment, roughly $0.00005.
+- **Free tiers:** at demo scale, the Cloud Run and Firestore free tiers absorb all infrastructure cost.
+- **Per customer:** about 1–2 US cents, roughly Rp 30–300 at ~Rp 16,500 per US$. 10,000 mixed assessments a month comes to about US$100.
+
+**Demo guardrails**
+- one Cloud Run instance at most
+- 5 Gemini calls per minute and 50 per day
+- a $10 budget with an automatic billing shutoff
 
 ## How scoring works
 Python computes every number: months covered, average inflow/outflow/net, income volatility, net margin, 3-month trend,
