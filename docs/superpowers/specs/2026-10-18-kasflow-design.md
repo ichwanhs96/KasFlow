@@ -1111,6 +1111,7 @@ It is idempotent. `deploy.sh` alone redeploys code changes.
 - **Five Gemini calls per minute:** `RateLimitedGemini` wraps the live Gemini backend with a 60-second sliding window (`GEMINI_RPM`, default 5). With a single instance this is a global limit. When the limit is hit:
   - uploads and pushed JSON return `429 rate_limited` without using up an item;
   - summaries degrade to `summary_failed`, and the analyst can use Regenerate summary.
+- **150 Gemini calls per day:** a daily cap (`GEMINI_DAILY_CAP`, default 150) is checked after the per-minute limit. It's counted in Firestore (`usage/gemini-YYYY-MM-DD`, a transactional increment), so instance restarts don't reset it. It resets at 00:00 UTC. Once reached, uploads return `429 daily_limit_reached`, and the collection page explains it in the customer's language.
 - **No Vertex-side cap:** Gemini 2.5 Flash uses Dynamic Shared Quota, so there's no per-project quota to lower.
 - **Billing shutoff:** `bootstrap.sh` deploys a Pub/Sub-triggered function (`infra/billing_cap`, local-only) that unlinks billing when the budget's cost reaches its amount. The user creates the $10 budget, excludes credits from it, and connects the budget to topic `kasflow-billing-cap`.
 
