@@ -899,7 +899,7 @@ Validation:
 **`#list`**
 - Header with the analyst email and a sign-out button.
 - Status filter tabs (segmented, rectangular): All, Needs more data, Scored, Reviewed, Error.
-- Table columns: customer (name, plus a type badge for individual or business), country flag, purpose, status chip, score/grade, recommendation (final recommendation if reviewed), updated time (relative).
+- Table columns: customer name, type (individual or business, its own column in the rigid table layout), country flag, purpose, status chip, score/grade, recommendation (final recommendation if reviewed), updated time (relative).
 - Clicking a row opens `#a/{id}`.
 - Polls every 5 s.
 
@@ -919,7 +919,7 @@ Validation:
    - A breakdown bar for each component.
    - Metric cards: average monthly inflow, outflow and net (formatted in the assessment currency using `Intl.NumberFormat` with the locale for the country), income volatility, net margin, trend, returned payments, debt burden, verified share, top-payer share, and affordability (max monthly commitment; installment and coverage ratio; suggested maximum amount).
    - A Chart.js chart: monthly inflow and outflow bars plus a net line.
-6. **AI summary panel**, labelled "AI-drafted by Gemini — analyst reviews before acting":
+6. **AI summary panel**, labelled "Drafted by Gemini. The analyst reviews before acting.":
    - headline and summary
    - strengths and risks, each with a metric chip; clicking a chip scrolls to and highlights that metric card
    - data notes and next steps

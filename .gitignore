@@ -12,3 +12,4 @@ scripts/fonts/
 hosting_public/*
 !hosting_public/.gitkeep
 .superpowers/
+.DS_Store

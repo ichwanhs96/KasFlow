@@ -89,3 +89,9 @@ def test_every_icon_used_exists():
     used |= set(re.findall(r'"(\w+)"', kinds))  # values of { open_finance: "bank", ... }
     assert {"bank", "wallet", "camera", "upload", "plug"} <= used
     assert used <= names, used - names
+
+
+def test_no_os_junk_files_tracked():
+    tracked = subprocess.run(["git", "ls-files"], cwd=ROOT, capture_output=True, text=True).stdout.split()
+    assert not [f for f in tracked if f.endswith(".DS_Store")]
+    assert ".DS_Store" in (ROOT / ".gitignore").read_text().split()
