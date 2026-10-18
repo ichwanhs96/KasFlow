@@ -3,66 +3,73 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>KasFlow · Share records</title>
+  <link rel="icon" href="/static/img/logo.svg" type="image/svg+xml">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="/static/css/app.css">
   <script type="module" src="/static/js/collect.js"></script>
 </head>
-<body class="bg-slate-100 min-h-screen">
-<div x-data="collectApp" x-cloak class="max-w-[480px] mx-auto p-4">
-  <div class="bg-white rounded-2xl shadow p-5">
-    <div class="flex justify-between items-center gap-2">
-      <span class="font-bold">💧 KasFlow</span>
-      <select x-model="lang" data-testid="lang" class="text-sm border rounded px-1 py-0.5">
+<body class="kf min-h-screen">
+<div x-data="collectApp" x-cloak class="max-w-[480px] mx-auto p-3">
+  <div class="panel overflow-hidden">
+    <div class="topbar"><div class="flex items-center gap-2 px-3 h-11">
+      <img src="/static/img/logo.svg" class="w-6 h-6" alt="">
+      <span class="wordmark"><span class="kas">Kas</span><span class="flow">Flow</span></span>
+      <select x-model="lang" data-testid="lang" class="field ml-auto text-[12px]">
         <option value="id">Bahasa Indonesia</option><option value="fil">Filipino</option>
         <option value="vi">Tiếng Việt</option><option value="en">English</option></select>
-    </div>
+    </div></div>
 
-    <p x-show="state === 'loading'" class="py-10 text-center text-slate-400">…</p>
-    <p x-show="state === 'invalid'" data-testid="state-invalid" class="py-10 text-center" x-text="t('invalid_link')"></p>
-    <p x-show="state === 'expired'" data-testid="state-expired" class="py-10 text-center" x-text="t('expired_link')"></p>
-    <p x-show="state === 'completed'" data-testid="state-completed" class="py-10 text-center" x-text="t('already_completed')"></p>
-    <div x-show="state === 'thanks'" data-testid="thanks" class="py-10 text-center">
-      <div class="text-5xl">✅</div><h2 class="text-xl font-semibold mt-3" x-text="t('thanks_title')"></h2>
-      <p class="text-slate-600 mt-1" x-text="t('thanks_body')"></p></div>
-
-    <div x-show="state === 'ready'">
-      <h1 class="text-xl font-semibold mt-4" x-text="t('title')"></h1>
-      <p class="text-sm mt-1" x-text="t('requesting')"></p>
-      <p class="text-xs text-slate-500 mt-2" x-text="t('consent_notice')"></p>
-      <div class="grid grid-cols-2 gap-3 mt-5">
-        <label class="big-btn">
-          <input type="file" multiple accept="application/pdf,image/png,image/jpeg,.csv,text/csv" class="hidden"
-                 data-testid="file-input" @change="onFiles($event)">
-          <span class="icon">📄</span><span x-text="t('upload')"></span></label>
-        <button type="button" class="big-btn" data-testid="take-photo" @click="takePhoto()">
-          <span class="icon">📷</span><span x-text="t('take_photo')"></span></button>
-        <input type="file" accept="image/*" capture="environment" class="hidden" x-ref="mobileCam" @change="onMobilePhoto($event)">
+    <div class="panel-b">
+      <p x-show="state === 'loading'" class="py-10 text-center text-slate-400"><span class="spinner"></span></p>
+      <p x-show="state === 'invalid'" data-testid="state-invalid" class="py-10 text-center" x-text="t('invalid_link')"></p>
+      <p x-show="state === 'expired'" data-testid="state-expired" class="py-10 text-center" x-text="t('expired_link')"></p>
+      <p x-show="state === 'completed'" data-testid="state-completed" class="py-10 text-center" x-text="t('already_completed')"></p>
+      <div x-show="state === 'thanks'" data-testid="thanks" class="py-10 text-center">
+        <div class="mx-auto w-11 h-11 flex items-center justify-center border border-[color:var(--pos-line)] bg-[color:var(--pos-bg)] text-[color:var(--pos-ink)]" x-html="icon('check', 24)"></div>
+        <h2 class="text-[16px] font-semibold mt-3" x-text="t('thanks_title')"></h2>
+        <p class="text-slate-600 mt-1" x-text="t('thanks_body')"></p>
       </div>
-      <div class="mt-3 rounded-lg border border-dashed p-3 text-center text-xs text-slate-500"
-           @dragover.prevent @drop.prevent="onFiles($event)" x-text="t('drop_hint')"></div>
-      <ul class="mt-4 space-y-2">
-        <template x-for="it in visibleItems" :key="it.id">
-          <li data-testid="collect-item" class="flex items-center gap-2 border rounded-lg p-2 text-sm">
-            <span class="truncate flex-1" x-text="it.label"></span>
-            <span x-show="it.status === 'processing'"><span class="spinner"></span> <span x-text="t('processing')"></span></span>
-            <span x-show="it.status === 'done'" class="text-emerald-700" data-testid="item-done" x-text="'✓ ' + t('n_read', { n: String(it.txn_count) })"></span>
-            <span x-show="it.status === 'failed'" class="text-red-600 text-xs" x-text="'✗ ' + t('extract_failed')"></span>
-            <button x-show="it.status === 'failed'" data-testid="item-remove" class="text-xs underline" @click="remove(it.id)" x-text="t('remove')"></button>
-          </li>
-        </template>
-      </ul>
-      <p x-show="err" class="text-red-600 text-sm mt-2" x-text="err"></p>
-      <button class="mt-5 w-full rounded-xl bg-emerald-600 text-white py-3 font-semibold disabled:opacity-40"
-              :disabled="doneCount === 0 || busy" data-testid="done" @click="done()" x-text="t('done')"></button>
+
+      <div x-show="state === 'ready'">
+        <h1 class="text-[16px] font-semibold" x-text="t('title')"></h1>
+        <p class="mt-1" x-text="t('requesting')"></p>
+        <p class="text-[12px] text-slate-500 mt-2 border-l-[3px] border-[color:var(--info-line)] pl-2" x-text="t('consent_notice')"></p>
+        <div class="grid grid-cols-2 gap-2 mt-4">
+          <label class="tile">
+            <input type="file" multiple accept="application/pdf,image/png,image/jpeg,.csv,text/csv" class="hidden"
+                   data-testid="file-input" @change="onFiles($event)">
+            <span class="ico text-[color:var(--primary)]" x-html="icon('upload', 24)"></span><span x-text="t('upload')"></span></label>
+          <button type="button" class="tile" data-testid="take-photo" @click="takePhoto()">
+            <span class="ico text-[color:var(--primary)]" x-html="icon('camera', 24)"></span><span x-text="t('take_photo')"></span></button>
+          <input type="file" accept="image/*" capture="environment" class="hidden" x-ref="mobileCam" @change="onMobilePhoto($event)">
+        </div>
+        <div class="mt-2 border border-dashed border-[color:var(--border)] p-2 text-center text-[12px] text-slate-500"
+             @dragover.prevent @drop.prevent="onFiles($event)" x-text="t('drop_hint')"></div>
+        <ul class="mt-3 border border-[color:var(--border)] divide-y divide-[color:var(--border)]" x-show="visibleItems.length">
+          <template x-for="it in visibleItems" :key="it.id">
+            <li data-testid="collect-item" class="flex flex-wrap items-center gap-2 px-2 py-2">
+              <span class="ico text-slate-500" x-html="icon('document')"></span>
+              <span class="truncate flex-1 min-w-0" x-text="it.label"></span>
+              <span x-show="it.status === 'processing'" class="text-[12px] text-slate-500"><span class="spinner"></span> <span x-text="t('processing')"></span></span>
+              <span x-show="it.status === 'done'" class="label label-pos" data-testid="item-done"><span class="ico" x-html="icon('check')"></span><span x-text="t('n_read', { n: String(it.txn_count) })"></span></span>
+              <span x-show="it.status === 'failed'" class="label label-neg whitespace-normal"><span class="ico" x-html="icon('cross')"></span><span x-text="t('extract_failed')"></span></span>
+              <button x-show="it.status === 'failed'" data-testid="item-remove" class="text-[12px] underline" @click="remove(it.id)" x-text="t('remove')"></button>
+            </li>
+          </template>
+        </ul>
+        <p x-show="err" class="label label-neg whitespace-normal w-full mt-2" x-text="err"></p>
+        <button class="btn btn-primary w-full justify-center h-10 mt-4 text-[14px]"
+                :disabled="doneCount === 0 || busy" data-testid="done" @click="done()" x-text="t('done')"></button>
+      </div>
     </div>
-    <p class="text-center text-xs text-slate-400 mt-4" x-text="t('secured_by')"></p>
+    <div class="border-t border-[color:var(--border)] bg-[color:var(--strip)] px-3 py-2 text-center text-[11px] text-slate-500" x-text="t('secured_by')"></div>
   </div>
 
-  <div x-show="camOpen" class="fixed inset-0 bg-black/80 flex flex-col items-center justify-center p-4 z-50">
-    <video x-ref="video" autoplay playsinline muted class="max-w-full max-h-[70vh] rounded"></video>
-    <div class="flex gap-3 mt-4">
-      <button class="rounded-lg bg-white px-5 py-2 font-semibold" data-testid="capture" @click="capture()" x-text="t('capture')"></button>
-      <button class="rounded-lg bg-slate-600 text-white px-5 py-2" data-testid="close-camera" @click="closeCam()" x-text="t('close')"></button>
+  <div x-show="camOpen" class="fixed inset-0 bg-[#1F2A37]/85 flex flex-col items-center justify-center p-4 z-50">
+    <video x-ref="video" autoplay playsinline muted class="max-w-full max-h-[70vh] border border-[color:var(--border)]"></video>
+    <div class="flex gap-2 mt-4">
+      <button class="btn btn-primary h-9" data-testid="capture" @click="capture()"><span class="ico" x-html="icon('camera')"></span><span x-text="t('capture')"></span></button>
+      <button class="btn h-9" data-testid="close-camera" @click="closeCam()"><span class="ico" x-html="icon('cross')"></span><span x-text="t('close')"></span></button>
     </div>
     <p class="text-white text-sm mt-3" x-show="doneCount > 0" x-text="t('n_read', { n: String(items.filter(i => i.status === 'done').reduce((s, i) => s + i.txn_count, 0)) })"></p>
   </div>

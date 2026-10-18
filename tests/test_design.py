@@ -46,3 +46,9 @@ def test_console_and_signin_use_the_design_system(client):
     js = client.get("/static/js/console.js").text
     assert 'from "/static/js/icons.js"' in js and "label-pos" in js
     assert 'rel="icon" href="/static/img/logo.svg"' in client.get("/demo-login").text
+
+
+def test_collect_page_uses_the_design_system(client):
+    c = client.get("/c/some-token").text
+    assert 'class="tile"' in c and "icon('camera'" in c and 'rel="icon" href="/static/img/logo.svg"' in c
+    assert 'from "/static/js/icons.js"' in client.get("/static/js/collect.js").text

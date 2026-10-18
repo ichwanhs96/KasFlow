@@ -1,5 +1,6 @@
 import Alpine from "https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/module.esm.js";
 import { T } from "/static/js/i18n.js";
+import { icon as svgIcon } from "/static/js/icons.js";
 
 let stream = null;
 const uid = () => `${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -7,6 +8,7 @@ const uid = () => `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 Alpine.data("collectApp", () => ({
   token: decodeURIComponent(location.pathname.split("/c/")[1] || ""),
   lang: "en", info: null, state: "loading", items: [], camOpen: false, photoN: 0, busy: false, err: "",
+  icon(name, size) { return svgIcon(name, size); },
 
   t(key, vars = {}) {
     let s = (T[this.lang] || T.en)[key] || T.en[key] || key;
