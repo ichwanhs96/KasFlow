@@ -41,6 +41,7 @@ class Settings:
     auth_backend: str = "stub"
     seed_on_start: bool = False
     gemini_rpm: int = 5  # max live Gemini calls per minute (cost guardrail; single instance => global)
+    gemini_daily_cap: int = 150  # max live Gemini calls per UTC day, persisted in Firestore
 
 
 def load_settings() -> Settings:
@@ -63,4 +64,5 @@ def load_settings() -> Settings:
         auth_backend=e("AUTH_BACKEND", "stub"),
         seed_on_start=e("SEED_ON_START", "false").lower() == "true",
         gemini_rpm=int(e("GEMINI_RPM", "5")),
+        gemini_daily_cap=int(e("GEMINI_DAILY_CAP", "150")),
     )

@@ -17,6 +17,7 @@ class Repo(Protocol):
     def get_transactions(self, id: str) -> list[Transaction]: ...
     def put_transactions(self, id: str, txns: list[Transaction]) -> None: ...
     def delete_assessment(self, id: str) -> None: ...
+    def incr_daily_counter(self, key: str, limit: int) -> bool: ...
 
 
 class InMemoryRepo:
@@ -24,6 +25,7 @@ class InMemoryRepo:
         self.clients: dict[str, dict] = {}
         self.assessments: dict[str, Assessment] = {}
         self.txns: dict[str, list[Transaction]] = {}
+        self.counters: dict[str, int] = {}
 
     def get_client_by_key_hash(self, h):
         for cid, c in self.clients.items():
@@ -68,6 +70,12 @@ class InMemoryRepo:
     def delete_assessment(self, id):
         self.assessments.pop(id, None)
         self.txns.pop(id, None)
+
+    def incr_daily_counter(self, key, limit):
+        if self.counters.get(key, 0) >= limit:
+            return False
+        self.counters[key] = self.counters.get(key, 0) + 1
+        return True
 
 
 class FirestoreRepo:
@@ -129,3 +137,20 @@ class FirestoreRepo:
     def delete_assessment(self, id):
         self._a().document(id).delete()
         self._db.collection("assessment_transactions").document(id).delete()
+
+    def incr_daily_counter(self, key, limit):
+        """Atomically take one unit from a capped counter (collection `usage`). False once the cap is reached."""
+        from google.cloud import firestore
+
+        ref = self._db.collection("usage").document(key)
+
+        @firestore.transactional
+        def take(txn):
+            snap = ref.get(transaction=txn)
+            count = (snap.to_dict() or {}).get("count", 0) if snap.exists else 0
+            if count >= limit:
+                return False
+            txn.set(ref, {"count": count + 1, "limit": limit, "updated_at": firestore.SERVER_TIMESTAMP})
+            return True
+
+        return take(self._db.transaction())

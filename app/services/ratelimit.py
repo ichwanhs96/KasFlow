@@ -1,3 +1,4 @@
+import datetime as dt
 import threading
 import time
 from collections import deque
@@ -25,3 +26,16 @@ class SlidingWindowLimiter:
                 return False
             self._hits.append(now)
             return True
+
+
+class DailyCap:
+    """At most `limit` acquisitions per UTC day, persisted in the repo so it survives instance restarts."""
+
+    def __init__(self, repo, limit: int, *, prefix: str = "gemini", clock=None) -> None:
+        self.repo = repo
+        self.limit = limit
+        self.prefix = prefix
+        self.clock = clock or (lambda: dt.datetime.now(dt.timezone.utc))
+
+    def try_acquire(self) -> bool:
+        return self.repo.incr_daily_counter(f"{self.prefix}-{self.clock().date().isoformat()}", self.limit)

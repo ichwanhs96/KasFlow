@@ -39,3 +39,8 @@ def test_collect_page_explains_rate_limit_in_every_language(client):
     js = client.get("/static/js/i18n.js").text
     assert js.count("busy:") == 4
     assert "r.status === 429" in client.get("/static/js/collect.js").text
+
+
+def test_collect_page_explains_daily_limit_in_every_language(client):
+    assert client.get("/static/js/i18n.js").text.count("daily_limit:") == 4
+    assert '"daily_limit_reached"' in client.get("/static/js/collect.js").text

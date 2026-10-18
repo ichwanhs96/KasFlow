@@ -11,6 +11,7 @@ export const T = {
     expired_link: "This link has expired. Please ask for a new one.", already_completed: "These records were already submitted. Thank you!",
     camera_denied: "Camera not available. Please use Upload instead.", secured_by: "Secured by KasFlow",
     busy: "We're handling a lot of requests. Please try this file again in a minute.",
+    daily_limit: "This demo has reached its daily limit. Please try again tomorrow.",
   },
   id: {
     title: "Bagikan catatan keuangan tambahan",
@@ -24,6 +25,7 @@ export const T = {
     expired_link: "Tautan ini sudah kedaluwarsa. Silakan minta tautan baru.", already_completed: "Catatan ini sudah dikirim. Terima kasih!",
     camera_denied: "Kamera tidak tersedia. Silakan gunakan Unggah file.", secured_by: "Diamankan oleh KasFlow",
     busy: "Sedang banyak permintaan. Silakan coba file ini lagi dalam satu menit.",
+    daily_limit: "Demo ini sudah mencapai batas harian. Silakan coba lagi besok.",
   },
   fil: {
     title: "Magbahagi ng karagdagang financial records",
@@ -37,6 +39,7 @@ export const T = {
     expired_link: "Nag-expire na ang link na ito. Humingi ng bago.", already_completed: "Naipadala na ang mga talaang ito. Salamat!",
     camera_denied: "Hindi magamit ang camera. Gamitin ang Mag-upload.", secured_by: "Secured ng KasFlow",
     busy: "Maraming request ngayon. Subukan ulit ang file na ito pagkalipas ng isang minuto.",
+    daily_limit: "Naabot na ng demo ang limitasyon nito ngayong araw. Subukan ulit bukas.",
   },
   vi: {
     title: "Chia sẻ thêm hồ sơ tài chính",
@@ -50,5 +53,6 @@ export const T = {
     expired_link: "Liên kết đã hết hạn. Vui lòng yêu cầu liên kết mới.", already_completed: "Hồ sơ đã được gửi. Cảm ơn bạn!",
     camera_denied: "Không dùng được camera. Vui lòng chọn Tải tệp lên.", secured_by: "Bảo mật bởi KasFlow",
     busy: "Hệ thống đang bận. Vui lòng thử lại tệp này sau một phút.",
+    daily_limit: "Bản demo đã đạt giới hạn trong ngày. Vui lòng thử lại vào ngày mai.",
   },
 };

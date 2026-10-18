@@ -24,6 +24,10 @@ class GeminiRateLimited(GeminiError):
     """The per-minute Gemini budget (GEMINI_RPM) is used up; try again shortly."""
 
 
+class GeminiDailyLimit(GeminiRateLimited):
+    """The daily Gemini budget (GEMINI_DAILY_CAP) is used up; resets at 00:00 UTC."""
+
+
 class GeminiService(Protocol):
     def extract_document(self, data: bytes, mime_type: str, *, filename: str, country: str,
                          reference_date: date) -> Extraction: ...
@@ -117,13 +121,16 @@ class StubGemini:
 class RateLimitedGemini:
     """Caps live Gemini calls (cost guardrail). Each call takes one slot from the limiter or raises GeminiRateLimited."""
 
-    def __init__(self, inner, limiter) -> None:
+    def __init__(self, inner, limiter, daily=None) -> None:
         self.inner = inner
         self.limiter = limiter
+        self.daily = daily
 
     def _take(self) -> None:
         if not self.limiter.try_acquire():
             raise GeminiRateLimited("Gemini rate limit reached; try again in a minute")
+        if self.daily is not None and not self.daily.try_acquire():
+            raise GeminiDailyLimit("Daily Gemini limit reached; resets at 00:00 UTC")
 
     def extract_document(self, *args, **kwargs):
         self._take()

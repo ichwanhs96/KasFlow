@@ -92,3 +92,73 @@ def test_build_services_rate_limits_only_live_gemini(monkeypatch):
     assert isinstance(live.gemini, RateLimitedGemini) and live.gemini.limiter.limit == 5
     assert live.assessments.gemini is live.gemini
     assert isinstance(main.build_services(Settings()).gemini, StubGemini)
+
+
+# ---- daily cap (persisted, so it survives scale-to-zero restarts) ----
+from datetime import timedelta  # noqa: E402
+
+from app.services.gemini import GeminiDailyLimit  # noqa: E402
+from app.services.ratelimit import DailyCap  # noqa: E402
+
+
+class Day:
+    def __init__(self):
+        self.now = datetime(2026, 10, 18, 23, 59, tzinfo=timezone.utc)
+
+    def __call__(self):
+        return self.now
+
+
+def test_inmemory_daily_counter_is_capped_per_key():
+    repo = InMemoryRepo()
+    assert [repo.incr_daily_counter("gemini-2026-10-18", 2) for _ in range(3)] == [True, True, False]
+    assert repo.incr_daily_counter("gemini-2026-10-19", 2) is True
+
+
+def test_daily_cap_resets_at_utc_midnight():
+    day = Day()
+    cap = DailyCap(InMemoryRepo(), 2, clock=day)
+    assert cap.try_acquire() and cap.try_acquire() and not cap.try_acquire()
+    day.now += timedelta(minutes=2)
+    assert cap.try_acquire()
+
+
+def test_settings_default_daily_cap_is_150(monkeypatch):
+    monkeypatch.delenv("GEMINI_DAILY_CAP", raising=False)
+    assert Settings().gemini_daily_cap == 150 and load_settings().gemini_daily_cap == 150
+    monkeypatch.setenv("GEMINI_DAILY_CAP", "40")
+    assert load_settings().gemini_daily_cap == 40
+
+
+def test_daily_limit_is_its_own_error_and_checked_after_the_minute_limit():
+    mono = Mono()
+    day_cap = DailyCap(InMemoryRepo(), 1, clock=Day())
+    g = RateLimitedGemini(StubGemini(), SlidingWindowLimiter(5, 60, clock=mono), daily=day_cap)
+    g.summarize({"metrics": {}}, purpose="loan", language="en")
+    with pytest.raises(GeminiDailyLimit) as e:
+        g.summarize({"metrics": {}}, purpose="loan", language="en")
+    assert isinstance(e.value, GeminiRateLimited)
+    minute_only = RateLimitedGemini(StubGemini(), SlidingWindowLimiter(0, 60, clock=mono), daily=DailyCap(InMemoryRepo(), 9, clock=Day()))
+    with pytest.raises(GeminiRateLimited):
+        minute_only.summarize({}, purpose="loan", language="en")
+    assert minute_only.daily.repo.counters == {}  # a minute-limited call doesn't spend the daily budget
+
+
+def test_upload_over_daily_cap_returns_429_daily_limit():
+    repo = InMemoryRepo()
+    seeding.ensure_demo_client(repo, Settings())
+    gem = RateLimitedGemini(StubGemini(), SlidingWindowLimiter(9, 60, clock=Mono()), daily=DailyCap(repo, 0, clock=Day()))
+    svc = AssessmentService(repo, gem, Settings(), clock=lambda: NOW)
+    _, url = svc.create("pinjamcepat", seeding.build_request(seeding.load_profile("sari"), "DC-1"))
+    with pytest.raises(AppError) as e:
+        svc.add_item(url.rsplit("/c/", 1)[1], data=(ASSETS_DIR / "sari_dompetku.png").read_bytes(),
+                     filename="sari_dompetku.png", mime_type="image/png", kind="upload")
+    assert e.value.status == 429 and e.value.code == "daily_limit_reached"
+
+
+def test_build_services_wires_the_daily_cap(monkeypatch):
+    import app.main as main
+
+    monkeypatch.setattr(main, "VertexGemini", lambda settings: StubGemini())
+    live = main.build_services(Settings(gemini_backend="vertex", gemini_daily_cap=150))
+    assert live.gemini.daily.limit == 150 and live.gemini.daily.repo is live.repo

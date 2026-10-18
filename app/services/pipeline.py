@@ -16,11 +16,18 @@ from app.models import (
 from app.repo import Repo
 from app.services import merge, mock_provider, scoring, sufficiency
 from app.services.adapters import csv_mapper, open_finance, standard
-from app.services.gemini import GeminiError, GeminiRateLimited, GeminiService, extraction_to_transactions
+from app.services.gemini import GeminiDailyLimit, GeminiError, GeminiRateLimited, GeminiService, extraction_to_transactions
 from app.services.sourcing import build_source
 from app.services.tokens import collection_url, hash_secret, new_collection_token
 
 BUSY_MESSAGE = "KasFlow is busy right now. Please try again in a minute."
+DAILY_LIMIT_MESSAGE = "KasFlow has reached its daily demo limit. Please try again tomorrow."
+
+
+def _limit_error(e: GeminiRateLimited) -> AppError:
+    if isinstance(e, GeminiDailyLimit):
+        return AppError(429, "daily_limit_reached", DAILY_LIMIT_MESSAGE)
+    return AppError(429, "rate_limited", BUSY_MESSAGE)
 ALLOWED_MIME = {"application/pdf", "image/png", "image/jpeg", "text/csv"}
 
 
@@ -183,7 +190,7 @@ class AssessmentService:
             try:
                 ext = self.gemini.map_json(req.payload, country=a.customer.country, reference_date=now.date())
             except GeminiRateLimited as e:
-                raise AppError(429, "rate_limited", BUSY_MESSAGE) from e
+                raise _limit_error(e) from e
             except GeminiError as e:
                 raise AppError(422, "unmappable_payload", "Could not find transactions in payload") from e
             txns = extraction_to_transactions(ext, source_id=sid, currency=a.currency, reference_date=now.date())
@@ -249,7 +256,7 @@ class AssessmentService:
             if not txns:
                 raise GeminiError("no transactions extracted")
         except GeminiRateLimited as e:
-            raise AppError(429, "rate_limited", BUSY_MESSAGE) from e
+            raise _limit_error(e) from e
         except (GeminiError, ValueError) as e:
             item.error = "extract_failed"
             a.collection.items.append(item)
