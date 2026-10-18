@@ -22,3 +22,6 @@ scripts/smoke.py
 scripts/check_gemini.py
 ACCESS.md
 .firebase/
+
+# Pitch decks (template and submission) stay local
+docs/*.pptx
