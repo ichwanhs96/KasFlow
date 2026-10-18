@@ -1,14 +1,17 @@
 # KasFlow: Design Spec
 
 - **Date:** 2026-10-18
-- **Status:** Implemented (v1). Revision 2 (2026-10-18): visual redesign, see §9.0
+- **Status:** Implemented.
+- **Revisions** (all 2026-10-18):
+  - **2:** visual redesign (§9.0).
+  - **3:** deployment and cost. Covers the Gemini timeouts (§8), scale-to-zero, cost guardrails and bootstrap (§12), the cost slide and its video scene (§9.5, §13), the README cost section (§14), and which files are kept local-only (§2).
 - **Audience:** the coding agent that will implement this, plus the human team
 
 ---
 
 ## 0. Intent (agreed in brainstorming)
 
-**What KasFlow is.** KasFlow is credit-scoring infrastructure for Southeast Asia, sold as a B2B vendor. Any company (a lender, BNPL provider, property platform, telco and so on) integrates KasFlow by API to assess its customer.
+**What KasFlow is.** KasFlow is credit-scoring infrastructure for Southeast Asia, sold as a B2B vendor. Any company (a lending company, BNPL provider, property platform, telco and so on) integrates KasFlow by API to assess its customer.
 
 **How it works.**
 1. **Open-finance data is the main source.** KasFlow pulls it first.
@@ -120,7 +123,8 @@ kasflow/
         open_finance.py    # provider JSON → Transaction[]
         standard.py        # validate client-pushed standard-format transactions
         csv_mapper.py      # apply a Gemini-produced column mapping to CSV rows
-      gemini.py            # extract_document, map_csv_columns, map_json, summarize
+      gemini.py            # extract_document, map_csv_columns, map_json, summarize; RateLimitedGemini
+      ratelimit.py         # per-minute sliding window + daily cap (Firestore counter)
       merge.py             # dedupe + internal-transfer detection
       tamper.py            # running-balance reconciliation
       sufficiency.py
@@ -132,27 +136,32 @@ kasflow/
       console.html         # analyst SPA (hash routes)
       collect.html         # collection page
       demo/client.html     # PinjamCepat mock client app
-      demo/intro.html, demo/outro.html, demo/login.html
-      js/firebase.js, js/console.js, js/collect.js, js/i18n.js, js/client-demo.js
-      css/app.css
+      demo/intro.html, demo/cost.html, demo/outro.html, demo/login.html
+      js/firebase.js, js/console.js, js/collect.js, js/i18n.js, js/client-demo.js, js/icons.js
+      css/app.css          # design tokens + components (§9.0)
+      img/logo.svg         # logo, also the favicon
   scripts/
     generate_personas.py   # deterministic data + demo_assets
-    seed.py                # writes demo client + seeded assessments to Firestore
-    check_gemini.py        # live extraction check on every demo asset
-    smoke.py               # deployed-URL smoke test
+    seed.py                # [local-only] writes demo client + seeded assessments to Firestore
+    check_gemini.py        # [local-only] live extraction check on every demo asset
+    smoke.py               # [local-only] deployed-URL smoke test
   data/personas/           # generated JSON (committed)
   demo_assets/             # generated PNG/CSV/PDF/y4m (committed, except y4m if >50MB)
   tests/                   # pytest (section 11)
   video/
-    package.json, playwright.config.ts, record_demo.ts, stitch.sh
+    package.json, record_demo.ts, check_pages.ts, stitch.sh
   Dockerfile
   firebase.json, .firebaserc, firestore.rules
-  deploy.sh
+  bootstrap.sh, deploy.sh  # [local-only] one-command setup + deploy (§12)
+  infra/billing_cap/       # [local-only] budget-triggered billing shutoff function
+  ACCESS.md                # [local-only] deploy runbook
   .env.example
   README.md, SUBMISSION.md
-  docs/pitch-outline.md
+  docs/pitch-outline.md, docs/voiceover-script.md
   docs/superpowers/specs/2026-10-18-kasflow-design.md   (this file)
 ```
+
+**[local-only]** files are gitignored. They stay on the developer's machine and aren't published, which keeps the public repo clean. Tests for them skip on a fresh clone.
 
 ---
 
@@ -181,7 +190,11 @@ Fixed constants live in `app/config.py`:
 | `COLLECTION_TTL_HOURS` | `72` |
 | `MAX_ITEMS` | `8` |
 | `MAX_FILE_BYTES` | `5 * 1024 * 1024` |
-| `GEMINI_TIMEOUT_S` | `45` (Firebase Hosting rewrites time out at 60 s) |
+| `GEMINI_TIMEOUT_S` | `25` (CSV/JSON mapping and summaries) |
+| `GEMINI_EXTRACT_TIMEOUT_S` | `50` (document extraction and `map_json`; a 62-row statement takes 21–30 s live) |
+| `GEMINI_DEADLINE_S` | `55` (total per call including a retry; Firebase Hosting rewrites time out at 60 s) |
+| `GEMINI_RPM` (env) | `5` live Gemini calls per minute |
+| `GEMINI_DAILY_CAP` (env) | `50` live Gemini calls per UTC day |
 
 Country table (`app/i18n.py`):
 
@@ -512,7 +525,12 @@ Lookup: `sha256(token)` is looked up with `find_by_token_hash`.
    - Append the transactions, then run merge and the sufficiency check. **Do not score yet**; scoring happens on `complete`.
    - Return `{item_id, status:"done", txn_count}`.
 4. **Failure:** the item is saved with `status:"failed"` and `error` set to a localized message key. Return `200` with `{status:"failed", message_key:"extract_failed"}`.
-5. **Discard the file bytes** once processing finishes.
+5. **Rate limits:** when the live Gemini limit is reached, return `429` and don't create an item:
+   - `rate_limited` when the per-minute limit is reached;
+   - `daily_limit_reached` when the daily cap is reached.
+   
+   The page shows the localized `busy` or `daily_limit` message (§12, cost guardrails).
+6. **Discard the file bytes** once processing finishes.
 
 ### 5.4 Demo endpoints
 
@@ -719,9 +737,13 @@ Signature: `score(txns, *, customer, sources, requested_amount, tenor_months, li
 
 Client setup:
 - `genai.Client(vertexai=True, project=GOOGLE_CLOUD_PROJECT, location=GOOGLE_CLOUD_LOCATION)`.
-- Every call uses `types.GenerateContentConfig(temperature=0.2, response_mime_type="application/json", response_schema=<pydantic model>)`.
-- Timeout: `GEMINI_TIMEOUT_S`, via `http_options` or `asyncio.wait_for`.
-- Retry once after 2 s on 429, 5xx or timeout.
+- Every call uses `types.GenerateContentConfig(temperature=0.2, response_mime_type="application/json", response_schema=<pydantic model>, thinking_config=ThinkingConfig(thinking_budget=0), http_options=HttpOptions(timeout=...))`.
+- **Thinking is off for every call.** This was measured live: extraction stayed exact (18/18 cash-book rows, 14/14 e-wallet rows), and long statements finished about 7 s faster.
+- **Per-call timeout:**
+  - `GEMINI_EXTRACT_TIMEOUT_S` (50 s) for `extract_document` and `map_json`, which produce large outputs;
+  - `GEMINI_TIMEOUT_S` (25 s) for everything else.
+- **Retry** once after 2 s on any exception, but only if a second full attempt still fits inside `GEMINI_DEADLINE_S` (55 s).
+- **Live calls are rate-limited** by `RateLimitedGemini` (§12). Over the limit, it raises `GeminiRateLimited` or `GeminiDailyLimit`, which are subclasses of `GeminiError`.
 - Parse with `Model.model_validate_json`.
 - On a second failure, raise `GeminiError`.
 
@@ -958,6 +980,7 @@ Validation:
 | Item states | `processing`, `n_read`, `extract_failed` |
 | Finishing | `done`, `thanks_title`, `thanks_body` |
 | Link errors and camera | `invalid_link`, `expired_link`, `already_completed`, `camera_denied`, `secured_by` |
+| Rate limits (rev 3) | `busy` (per-minute limit), `daily_limit` (daily cap) |
 
 Each key needs a translation in en, id, fil and vi.
 
@@ -1092,7 +1115,16 @@ All tests use `REPO_BACKEND=memory` and `GEMINI_BACKEND=stub`. No network access
 | `test_tokens.py` | Hashing. URL format. Expiry. |
 | `test_personas.py` | Golden outcomes. Sari: insufficient before uploads, then favorable with grade A or B after the stub uploads. Paolo: C/review. Linh: D/unfavorable with 2 tamper flags. |
 | `test_design.py` | Revision 2 rules: no emoji (except country flags) in `app/static/**`, `README.md`, `SUBMISSION.md`, `docs/pitch-outline.md` and `video/record_demo.ts`; the logo is served and every HTML page links the favicon; `icons.js` exports every icon name the pages use. |
+| `test_ratelimit.py` | Sliding window (5/min) and recovery. Daily cap per UTC day, with midnight reset. A minute-limited call doesn't spend the daily budget. Uploads over the limit return 429 (`rate_limited` / `daily_limit_reached`) without using up an item. Summaries over the limit become `summary_failed`. Only live Gemini is wrapped. |
+| `test_gemini.py` (rev 3) | Timeouts fit the Hosting limit. Extraction and `map_json` use 50 s, mapping uses 25 s. Thinking budget is 0. A fast failure retries; a slow timeout doesn't. |
+| `test_deploy_scripts.py`, `test_billing_cap.py` | Local-only, so they skip on a clean clone. Scripts parse and are executable. `deploy.sh` uses `--min-instances 0 --max-instances 1 --cpu-boost`. `bootstrap.sh` sets up the billing shutoff. The shutoff unlinks billing only at or over budget. |
 | `test_api.py` | TestClient tests. Client API auth (401). Create returns `needs_more_data` and a `collection_url` for Sari. Create returns `scored` for Paolo. Collect GET; invalid link 404; expired link 410 (by monkeypatching the clock); bad MIME type 422; item upload; complete then scored. The console API rejects a missing token (dependency override for valid tokens). Review accept and override. Pushing a source with `standard` and with `auto`. `frame-ancestors` header on `/c/{token}`. |
+
+**Browser check:** `video/check_pages.ts` opens every page, including the cost slide, and fails on:
+- any console error;
+- a primary button whose colour is overridden;
+- horizontal overflow at 375 px;
+- anything other than exactly one tamper label on Linh.
 
 **Live checks (not in CI):**
 - `scripts/check_gemini.py`
@@ -1136,7 +1168,7 @@ It is idempotent. `deploy.sh` alone redeploys code changes.
 4. Deploy to Cloud Run:
    ```
    gcloud run deploy kasflow --source . --region $REGION --service-account kasflow-run@… \
-     --allow-unauthenticated --min-instances 0 --cpu-boost --timeout 300 --memory 1Gi \
+     --allow-unauthenticated --min-instances 0 --max-instances 1 --cpu-boost --timeout 300 --memory 1Gi \
      --set-env-vars GOOGLE_CLOUD_PROJECT=…,GOOGLE_CLOUD_LOCATION=…,GEMINI_MODEL=…,PUBLIC_BASE_URL=…,FIREBASE_WEB_…=…,REPO_BACKEND=firestore,GEMINI_BACKEND=vertex \
      --set-env-vars DEMO_CLIENT_API_KEY=…,DEMO_LOGIN_KEY=…
    ```
@@ -1181,7 +1213,10 @@ It is idempotent. `deploy.sh` alone redeploys code changes.
 - **`pause(ms)`:** reading time for viewers. This is allowed only in the video script.
 - **Waits:** always `await expect(locator).toBeVisible({timeout: 60000})`, never fixed waits for app state.
 
-**Scenes** (target 3:20–3:30; `BASE_PACE` 1.65 stretches all pauses, and `PACE` fine-tunes so the total lands between 3:00 and 4:00)
+**Scenes**
+- **Length:** the local stub-mode recording measures 3:37. A live run adds a few seconds.
+- **Pacing:** `BASE_PACE` 1.65 stretches all pauses, and `PACE` fine-tunes so the total lands between 3:00 and 4:00.
+- **Narration:** `docs/voiceover-script.md`, timed to these captions.
 
 | # | Scene | Actions | Caption(s) |
 |---|---|---|---|
@@ -1222,10 +1257,14 @@ It is idempotent. `deploy.sh` alone redeploys code changes.
   - per-client tenancy and analyst invites
   - Secret Manager
   - rate limiting
+- **Deployment:** how each Google service is used. No step-by-step commands, because the scripts are local-only.
+- **Cost per assessment:** a measured table per persona (Gemini calls, tokens, Gemini cost, infrastructure cost, total), where the cost comes from, the cost at scale, and the demo guardrails.
 
 **`SUBMISSION.md`**
-- A brief description of about 200 words.
+- A brief description of about 200 words, including the measured cost per assessment (US$0.002–0.018).
 - An explicit paragraph each for **Firebase** (Auth and Hosting), **Firestore**, **Cloud Run** and **Gemini**, using the roles in §1.
+
+**`docs/voiceover-script.md`:** a narration script for the video, with one part per caption-timed scene, optional lines, and recording tips.
 
 **`docs/pitch-outline.md`**: content for each slide, to paste into the organiser's template. No emoji in any of these documents (§9.0).
 1. **Problem:** the US$2.5T APAC MSME credit gap (ADB 2024); thin-file customers.
