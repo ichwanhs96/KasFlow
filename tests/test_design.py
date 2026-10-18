@@ -52,3 +52,40 @@ def test_collect_page_uses_the_design_system(client):
     c = client.get("/c/some-token").text
     assert 'class="tile"' in c and "icon('camera'" in c and 'rel="icon" href="/static/img/logo.svg"' in c
     assert 'from "/static/js/icons.js"' in client.get("/static/js/collect.js").text
+
+
+FLAGS = re.compile("[\U0001F1E6-\U0001F1FF]{2}")
+EMOJI = re.compile("[\U0001F000-\U0001FAFF⌀-⏿■-◿☀-➿⬀-⯿️‍]")
+DOCS = [ROOT / "README.md", ROOT / "SUBMISSION.md", ROOT / "docs" / "pitch-outline.md", ROOT / "video" / "record_demo.ts"]
+
+
+def checked_files():
+    static = sorted(p for p in STATIC_DIR.rglob("*") if p.suffix in {".html", ".js", ".css", ".svg"})
+    return static + DOCS
+
+
+@pytest.mark.parametrize("path", checked_files(), ids=lambda p: str(p.relative_to(ROOT)))
+def test_no_emoji_except_country_flags(path):
+    text = FLAGS.sub("", path.read_text(encoding="utf-8"))
+    found = sorted(set(EMOJI.findall(text)))
+    assert not found, f"emoji in {path.relative_to(ROOT)}: {found}"
+
+
+@pytest.mark.parametrize("page", sorted(STATIC_DIR.rglob("*.html")), ids=lambda p: p.name)
+def test_every_page_links_the_favicon(page):
+    assert 'rel="icon" href="/static/img/logo.svg"' in page.read_text(encoding="utf-8")
+
+
+def test_every_icon_used_exists():
+    names = icon_names()
+    used = set()
+    for p in STATIC_DIR.rglob("*"):
+        if p.suffix in {".html", ".js"}:
+            text = p.read_text(encoding="utf-8")
+            used |= set(re.findall(r"""icon\(\s*['"](\w+)['"]""", text))
+            for pair in re.findall(r"""icon\([^)]*\?\s*['"](\w+)['"]\s*:\s*['"](\w+)['"]""", text):
+                used |= set(pair)  # ternaries such as icon(ok ? 'check' : 'cross')
+    kinds = (STATIC_DIR / "js" / "console.js").read_text(encoding="utf-8").split("const KIND_ICON = {", 1)[1].split("};", 1)[0]
+    used |= set(re.findall(r'"(\w+)"', kinds))  # values of { open_finance: "bank", ... }
+    assert {"bank", "wallet", "camera", "upload", "plug"} <= used
+    assert used <= names, used - names

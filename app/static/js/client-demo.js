@@ -1,8 +1,10 @@
 import Alpine from "https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/module.esm.js";
+import { icon as svgIcon } from "/static/js/icons.js";
 
 Alpine.data("clientDemo", () => ({
   personas: [], persona: "sari", form: { purpose: "loan", requested_amount: "", tenor_months: "" },
   consentOpen: false, log: [], phase: "form", collectionUrl: "", assessmentId: null, busy: false, err: "",
+  icon(name, size) { return svgIcon(name, size); },
 
   async init() {
     this.personas = (await (await fetch("/api/demo/personas")).json()).items;

@@ -20,9 +20,9 @@ async function caption(page: Page, text: string) {
     d.id = "kf-caption";
     d.textContent = t;
     Object.assign(d.style, {
-      position: "fixed", left: "50%", bottom: "28px", transform: "translateX(-50%)", background: "rgba(0,0,0,0.75)",
-      color: "#fff", fontSize: "22px", padding: "10px 18px", borderRadius: "12px", zIndex: "2147483647",
-      maxWidth: "90%", textAlign: "center", fontFamily: "system-ui, sans-serif", pointerEvents: "none",
+      position: "fixed", left: "50%", bottom: "28px", transform: "translateX(-50%)", background: "rgba(30,58,95,0.92)",
+      color: "#fff", fontSize: "20px", padding: "10px 18px", borderRadius: "0", borderLeft: "3px solid #3FA37A",
+      zIndex: "2147483647", maxWidth: "90%", textAlign: "center", fontFamily: "system-ui, sans-serif", pointerEvents: "none",
     });
     document.body.appendChild(d);
   }, text);

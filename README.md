@@ -1,4 +1,4 @@
-# 💧 KasFlow — credit signals from any data
+# KasFlow — credit signals from any data
 
 KasFlow is credit-scoring infrastructure for Southeast Asia. Any company (lending, BNPL, rental, insurance) creates an
 assessment through the API. KasFlow pulls **open-finance data first**. Only if that data isn't enough, it gives the
