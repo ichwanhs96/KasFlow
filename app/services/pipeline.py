@@ -16,10 +16,11 @@ from app.models import (
 from app.repo import Repo
 from app.services import merge, mock_provider, scoring, sufficiency
 from app.services.adapters import csv_mapper, open_finance, standard
-from app.services.gemini import GeminiError, GeminiService, extraction_to_transactions
+from app.services.gemini import GeminiError, GeminiRateLimited, GeminiService, extraction_to_transactions
 from app.services.sourcing import build_source
 from app.services.tokens import collection_url, hash_secret, new_collection_token
 
+BUSY_MESSAGE = "KasFlow is busy right now. Please try again in a minute."
 ALLOWED_MIME = {"application/pdf", "image/png", "image/jpeg", "text/csv"}
 
 
@@ -181,6 +182,8 @@ class AssessmentService:
         else:
             try:
                 ext = self.gemini.map_json(req.payload, country=a.customer.country, reference_date=now.date())
+            except GeminiRateLimited as e:
+                raise AppError(429, "rate_limited", BUSY_MESSAGE) from e
             except GeminiError as e:
                 raise AppError(422, "unmappable_payload", "Could not find transactions in payload") from e
             txns = extraction_to_transactions(ext, source_id=sid, currency=a.currency, reference_date=now.date())
@@ -245,6 +248,8 @@ class AssessmentService:
                 txns = extraction_to_transactions(ext, source_id=sid, currency=a.currency, reference_date=ref)
             if not txns:
                 raise GeminiError("no transactions extracted")
+        except GeminiRateLimited as e:
+            raise AppError(429, "rate_limited", BUSY_MESSAGE) from e
         except (GeminiError, ValueError) as e:
             item.error = "extract_failed"
             a.collection.items.append(item)

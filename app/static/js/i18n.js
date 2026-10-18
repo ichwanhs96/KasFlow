@@ -10,6 +10,7 @@ export const T = {
     thanks_body: "Your records were received. You can return to the app.", invalid_link: "This link is not valid.",
     expired_link: "This link has expired. Please ask for a new one.", already_completed: "These records were already submitted. Thank you!",
     camera_denied: "Camera not available. Please use Upload instead.", secured_by: "Secured by KasFlow",
+    busy: "We're handling a lot of requests. Please try this file again in a minute.",
   },
   id: {
     title: "Bagikan catatan keuangan tambahan",
@@ -22,6 +23,7 @@ export const T = {
     thanks_body: "Catatan Anda sudah kami terima. Silakan kembali ke aplikasi.", invalid_link: "Tautan ini tidak valid.",
     expired_link: "Tautan ini sudah kedaluwarsa. Silakan minta tautan baru.", already_completed: "Catatan ini sudah dikirim. Terima kasih!",
     camera_denied: "Kamera tidak tersedia. Silakan gunakan Unggah file.", secured_by: "Diamankan oleh KasFlow",
+    busy: "Sedang banyak permintaan. Silakan coba file ini lagi dalam satu menit.",
   },
   fil: {
     title: "Magbahagi ng karagdagang financial records",
@@ -34,6 +36,7 @@ export const T = {
     thanks_body: "Natanggap na ang iyong mga talaan. Maaari ka nang bumalik sa app.", invalid_link: "Hindi valid ang link na ito.",
     expired_link: "Nag-expire na ang link na ito. Humingi ng bago.", already_completed: "Naipadala na ang mga talaang ito. Salamat!",
     camera_denied: "Hindi magamit ang camera. Gamitin ang Mag-upload.", secured_by: "Secured ng KasFlow",
+    busy: "Maraming request ngayon. Subukan ulit ang file na ito pagkalipas ng isang minuto.",
   },
   vi: {
     title: "Chia sẻ thêm hồ sơ tài chính",
@@ -46,5 +49,6 @@ export const T = {
     thanks_body: "Chúng tôi đã nhận hồ sơ của bạn. Bạn có thể quay lại ứng dụng.", invalid_link: "Liên kết này không hợp lệ.",
     expired_link: "Liên kết đã hết hạn. Vui lòng yêu cầu liên kết mới.", already_completed: "Hồ sơ đã được gửi. Cảm ơn bạn!",
     camera_denied: "Không dùng được camera. Vui lòng chọn Tải tệp lên.", secured_by: "Bảo mật bởi KasFlow",
+    busy: "Hệ thống đang bận. Vui lòng thử lại tệp này sau một phút.",
   },
 };

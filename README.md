@@ -42,6 +42,8 @@ KasFlow runs on Google Cloud:
 - **Vertex AI Gemini:** document extraction, CSV/JSON mapping and explanations.
 - **Firebase Authentication:** Google sign-in for analysts.
 
+Cost guardrails: at most one Cloud Run instance, at most 5 Gemini calls per minute (`GEMINI_RPM`), and a budget-triggered billing shutoff.
+
 Production settings: `REPO_BACKEND=firestore`, `GEMINI_BACKEND=vertex`, `AUTH_BACKEND=firebase`, plus the `GOOGLE_CLOUD_*`, `FIREBASE_WEB_*` and demo-key variables listed in `.env.example`.
 
 ## How scoring works

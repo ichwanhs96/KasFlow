@@ -1106,6 +1106,14 @@ All tests use `REPO_BACKEND=memory` and `GEMINI_BACKEND=stub`. No network access
 
 It is idempotent. `deploy.sh` alone redeploys code changes.
 
+**Cost guardrails.**
+- **One instance:** Cloud Run runs with `--max-instances 1`, so a flood queues or fails instead of scaling out.
+- **Five Gemini calls per minute:** `RateLimitedGemini` wraps the live Gemini backend with a 60-second sliding window (`GEMINI_RPM`, default 5). With a single instance this is a global limit. When the limit is hit:
+  - uploads and pushed JSON return `429 rate_limited` without using up an item;
+  - summaries degrade to `summary_failed`, and the analyst can use Regenerate summary.
+- **No Vertex-side cap:** Gemini 2.5 Flash uses Dynamic Shared Quota, so there's no per-project quota to lower.
+- **Billing shutoff:** `bootstrap.sh` deploys a Pub/Sub-triggered function (`infra/billing_cap`, local-only) that unlinks billing when the budget's cost reaches its amount. The user creates the $10 budget, excludes credits from it, and connects the budget to topic `kasflow-billing-cap`.
+
 **`Dockerfile`**
 - Base image `python:3.12-slim`; `pip install -r requirements.txt`.
 - Copy `app/`, `data/` and `demo_assets/`, excluding the y4m.

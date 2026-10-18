@@ -40,6 +40,7 @@ class Settings:
     gemini_backend: str = "stub"
     auth_backend: str = "stub"
     seed_on_start: bool = False
+    gemini_rpm: int = 5  # max live Gemini calls per minute (cost guardrail; single instance => global)
 
 
 def load_settings() -> Settings:
@@ -61,4 +62,5 @@ def load_settings() -> Settings:
         gemini_backend=e("GEMINI_BACKEND", "stub"),
         auth_backend=e("AUTH_BACKEND", "stub"),
         seed_on_start=e("SEED_ON_START", "false").lower() == "true",
+        gemini_rpm=int(e("GEMINI_RPM", "5")),
     )

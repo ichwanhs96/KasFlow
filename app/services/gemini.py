@@ -20,6 +20,10 @@ class GeminiError(Exception):
     pass
 
 
+class GeminiRateLimited(GeminiError):
+    """The per-minute Gemini budget (GEMINI_RPM) is used up; try again shortly."""
+
+
 class GeminiService(Protocol):
     def extract_document(self, data: bytes, mime_type: str, *, filename: str, country: str,
                          reference_date: date) -> Extraction: ...
@@ -108,6 +112,34 @@ class StubGemini:
 
     def summarize(self, facts, *, purpose, language):
         return stub_summary(facts, language)
+
+
+class RateLimitedGemini:
+    """Caps live Gemini calls (cost guardrail). Each call takes one slot from the limiter or raises GeminiRateLimited."""
+
+    def __init__(self, inner, limiter) -> None:
+        self.inner = inner
+        self.limiter = limiter
+
+    def _take(self) -> None:
+        if not self.limiter.try_acquire():
+            raise GeminiRateLimited("Gemini rate limit reached; try again in a minute")
+
+    def extract_document(self, *args, **kwargs):
+        self._take()
+        return self.inner.extract_document(*args, **kwargs)
+
+    def map_csv_columns(self, *args, **kwargs):
+        self._take()
+        return self.inner.map_csv_columns(*args, **kwargs)
+
+    def map_json(self, *args, **kwargs):
+        self._take()
+        return self.inner.map_json(*args, **kwargs)
+
+    def summarize(self, *args, **kwargs):
+        self._take()
+        return self.inner.summarize(*args, **kwargs)
 
 
 class VertexGemini:

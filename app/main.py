@@ -14,8 +14,9 @@ from app.errors import AppError
 from app.models import utcnow
 from app.repo import FirestoreRepo, InMemoryRepo
 from app.routers import client_api, collect_api, console_api, demo, pages
-from app.services.gemini import StubGemini, VertexGemini
+from app.services.gemini import RateLimitedGemini, StubGemini, VertexGemini
 from app.services.pipeline import AssessmentService
+from app.services.ratelimit import SlidingWindowLimiter
 
 API_DESCRIPTION = (
     "KasFlow turns open-finance data — plus any customer-supplied records — into a deterministic, explained "
@@ -24,7 +25,10 @@ API_DESCRIPTION = (
 
 def build_services(settings: Settings, *, clock=utcnow) -> Services:
     repo = FirestoreRepo(settings.project) if settings.repo_backend == "firestore" else InMemoryRepo()
-    gemini = VertexGemini(settings) if settings.gemini_backend == "vertex" else StubGemini()
+    if settings.gemini_backend == "vertex":
+        gemini = RateLimitedGemini(VertexGemini(settings), SlidingWindowLimiter(settings.gemini_rpm, 60))
+    else:
+        gemini = StubGemini()
     verifier = FirebaseVerifier(settings.project) if settings.auth_backend == "firebase" else StubVerifier()
     return Services(settings=settings, repo=repo, gemini=gemini, verifier=verifier,
                     assessments=AssessmentService(repo, gemini, settings, clock=clock))

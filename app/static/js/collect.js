@@ -47,6 +47,7 @@ Alpine.data("collectApp", () => ({
     try {
       const r = await fetch(`/api/collect/${encodeURIComponent(this.token)}/items`, { method: "POST", body: fd });
       const body = await r.json().catch(() => ({}));
+      if (r.status === 429) { this.items[idx] = { ...this.items[idx], removed: true }; this.err = this.t("busy"); return; }
       if (!r.ok) throw new Error(body?.error?.message || "error");
       this.items[idx] = { ...this.items[idx], status: body.status, txn_count: body.txn_count || 0 };
     } catch (e) {

@@ -33,3 +33,9 @@ def test_demo_pages(client):
     for page in ("/", "/console", "/demo/client", "/demo/intro", "/demo/outro"):
         text = client.get(page).text.lower()
         assert "borrower" not in text and "lender" not in text
+
+
+def test_collect_page_explains_rate_limit_in_every_language(client):
+    js = client.get("/static/js/i18n.js").text
+    assert js.count("busy:") == 4
+    assert "r.status === 429" in client.get("/static/js/collect.js").text
