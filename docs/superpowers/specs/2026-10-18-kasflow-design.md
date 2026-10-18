@@ -105,7 +105,7 @@ Analyst browser ──(Firebase Auth Google ID token)────────┤
 ```
 kasflow/
   app/
-    main.py                # FastAPI app factory; mounts routers & static; /healthz; /config.js
+    main.py                # FastAPI app factory; mounts routers & static; /health; /config.js
     config.py              # Settings (pydantic-settings or os.environ)
     auth.py                # require_analyst (Firebase ID token), require_client (X-API-Key)
     models.py              # Pydantic models (section 4)
@@ -559,7 +559,7 @@ Lookup: `sha256(token)` is looked up with `find_by_token_hash`.
 | `/demo-login` | `demo/login.html` | Reads `?key=`, gets a custom token, calls `signInWithCustomToken`, then redirects to `/console`. |
 | `/docs` | FastAPI Swagger | Title "KasFlow Client API". Document only the `/api/v1` routes; other routers use `include_in_schema=False`. |
 | `/config.js` | | `window.KASFLOW_CONFIG = {firebase:{apiKey,authDomain,projectId,appId}}` |
-| `/healthz` | | `{ok:true}` |
+| `/health` | | `{ok:true}`. Not `/healthz`: Cloud Run's front end reserves some paths ending in `z` and returns its own 404 for them. |
 
 ---
 
@@ -1127,7 +1127,7 @@ All tests use `REPO_BACKEND=memory` and `GEMINI_BACKEND=stub`. No network access
 
 **Live checks (not in CI):**
 - `scripts/check_gemini.py`
-- `scripts/smoke.py BASE_URL`: checks `/healthz`, creates a Paolo assessment through the API with the demo key, checks it is `scored`, and checks `GET /docs` returns 200.
+- `scripts/smoke.py BASE_URL`: checks `/health`, creates a Paolo assessment through the API with the demo key, checks it is `scored`, and checks `GET /docs` returns 200.
 
 ---
 
@@ -1282,7 +1282,7 @@ It is idempotent. `deploy.sh` alone redeploys code changes.
 
 ## 15. Build order (milestones for the implementation plan)
 
-1. **Scaffold.** Repo, `requirements.txt`, `app/main.py` with `/healthz`, config, models, and `InMemoryRepo`.
+1. **Scaffold.** Repo, `requirements.txt`, `app/main.py` with `/health`, config, models, and `InMemoryRepo`.
 2. **Pure core, test-first.** `scoring`, `merge`, `tamper`, `sufficiency`, `tokens`, adapters, `csv_mapper`.
 3. **Personas.** `generate_personas.py` with the fixtures and assets, plus `test_personas.py` passing in stub mode.
 4. **Pipeline and APIs.** Client API, collect API, console API and demo endpoints, plus `test_api.py`.

@@ -40,6 +40,6 @@ def test_create_request_parses_nested():
 
 
 def test_health_and_config(client):
-    assert client.get("/healthz").json() == {"ok": True}
+    assert client.get("/health").json() == {"ok": True}
     r = client.get("/config.js")
     assert r.status_code == 200 and '"authMode": "stub"' in r.text

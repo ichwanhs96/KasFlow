@@ -58,8 +58,9 @@ def create_app(settings: Settings | None = None, services: Services | None = Non
     app.include_router(pages.router)
     app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
-    @app.get("/healthz", include_in_schema=False)
-    def healthz():
+    # Not /healthz: Cloud Run's front end reserves some paths ending in "z" and answers them itself.
+    @app.get("/health", include_in_schema=False)
+    def health():
         return {"ok": True}
 
     @app.get("/config.js", include_in_schema=False)

@@ -11,7 +11,7 @@ PAOLO = {"customer": {"name": "Paolo Reyes", "type": "individual", "occupation_o
 
 
 def test_health_and_config(client):
-    assert client.get("/healthz").json() == {"ok": True}
+    assert client.get("/health").json() == {"ok": True}
     assert '"authMode": "stub"' in client.get("/config.js").text
 
 
@@ -72,3 +72,11 @@ def test_openapi_documents_only_client_routes(client):
     assert spec["info"]["title"] == "KasFlow Client API"
     assert spec["paths"] and all(p.startswith("/api/v1/") for p in spec["paths"])
     assert client.get("/docs").status_code == 200
+
+
+def test_no_route_uses_a_path_reserved_by_cloud_run(client):
+    # Cloud Run's front end answers some paths ending in "z" (e.g. /healthz) itself with a Google 404,
+    # so such routes work locally but never reach the container in production.
+    paths = [r.path for r in client.app.routes if hasattr(r, "path")]
+    assert "/health" in paths
+    assert not [p for p in paths if p.rstrip("/").endswith("z")]
