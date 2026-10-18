@@ -1,0 +1,10 @@
+.git
+.venv
+__pycache__
+tests
+video
+docs
+scripts/fonts
+demo_assets/*.y4m
+.env
+.env.deploy

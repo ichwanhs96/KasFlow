@@ -1,0 +1,7 @@
+{
+  "hosting": {
+    "public": "hosting_public",
+    "rewrites": [{ "source": "**", "run": { "serviceId": "kasflow", "region": "asia-southeast1" } }]
+  },
+  "firestore": { "rules": "firestore.rules" }
+}
