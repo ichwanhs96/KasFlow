@@ -19,3 +19,17 @@ def test_collect_page_is_embeddable(client):
     js = client.get("/static/js/i18n.js").text
     for s in ("Ambil foto", "transaksi terbaca", "Selesai", "Kumuha ng litrato", "Chụp ảnh"):
         assert s in js
+
+
+def test_demo_pages(client):
+    c = client.get("/demo/client")
+    assert c.status_code == 200 and "PinjamCepat" in c.text and 'allow="camera"' in c.text
+    for testid in ("connect-accounts", "consent-allow", "api-log", "kasflow-frame", "received"):
+        assert testid in c.text
+    assert "Data diterima" in c.text
+    assert "US$2.5 trillion" in client.get("/demo/intro").text
+    assert "Cloud Run" in client.get("/demo/outro").text
+    assert "signInCustom" in client.get("/demo-login").text
+    for page in ("/", "/console", "/demo/client", "/demo/intro", "/demo/outro"):
+        text = client.get(page).text.lower()
+        assert "borrower" not in text and "lender" not in text

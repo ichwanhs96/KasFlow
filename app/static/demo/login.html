@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>KasFlow demo login</title>
+  <script src="/config.js"></script></head>
+<body style="font-family: system-ui, sans-serif; padding: 2rem;">
+  <p id="msg">Signing in…</p>
+  <script type="module">
+    import { signInCustom } from "/static/js/firebase.js";
+    const key = new URLSearchParams(location.search).get("key") || "";
+    const r = await fetch(`/api/demo/custom-token?key=${encodeURIComponent(key)}`);
+    if (!r.ok) { document.getElementById("msg").textContent = "Demo login unavailable."; }
+    else { const { token } = await r.json(); await signInCustom(token); location.href = "/console"; }
+  </script>
+</body>
+</html>
