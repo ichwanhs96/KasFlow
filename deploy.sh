@@ -27,7 +27,7 @@ gcloud iam service-accounts add-iam-policy-binding "$SA" --member="serviceAccoun
   --role=roles/iam.serviceAccountTokenCreator >/dev/null
 
 gcloud run deploy kasflow --source . --region "$REGION" --service-account "$SA" --allow-unauthenticated \
-  --min-instances 1 --timeout 300 --memory 1Gi \
+  --min-instances 0 --cpu-boost --timeout 300 --memory 1Gi \
   --set-env-vars "GOOGLE_CLOUD_PROJECT=$PROJECT,GOOGLE_CLOUD_LOCATION=$VERTEX_LOCATION,GEMINI_MODEL=${GEMINI_MODEL:-gemini-2.5-flash},PUBLIC_BASE_URL=$BASE_URL,REPO_BACKEND=firestore,GEMINI_BACKEND=vertex,AUTH_BACKEND=firebase,DEMO_CLIENT_API_KEY=$DEMO_CLIENT_API_KEY,DEMO_LOGIN_KEY=$DEMO_LOGIN_KEY,FIREBASE_WEB_API_KEY=$FIREBASE_WEB_API_KEY,FIREBASE_WEB_AUTH_DOMAIN=$FIREBASE_WEB_AUTH_DOMAIN,FIREBASE_WEB_PROJECT_ID=$FIREBASE_WEB_PROJECT_ID,FIREBASE_WEB_APP_ID=$FIREBASE_WEB_APP_ID"
 
 cat > .firebaserc <<EOF

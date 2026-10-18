@@ -59,7 +59,7 @@ Analyst browser ──(Firebase Auth Google ID token)────────┤
                                                          ▼
                  Firebase Hosting  https://<project>.web.app   (rewrite "**" → Cloud Run)
                                                          ▼
-                 Cloud Run service "kasflow"  (one FastAPI container, min-instances=1)
+                 Cloud Run service "kasflow"  (one FastAPI container, min-instances=0, scales to zero)
                    ├─ static pages (HTML + Alpine.js + Tailwind CDN, no build step)
                    ├─ /api/v1/*          client API (API key)
                    ├─ /api/console/*     analyst API (Firebase ID token)
@@ -855,7 +855,7 @@ Validation:
 
 **Rules**
 - **No emoji anywhere** in the UI, the intro and outro cards, video captions, README, SUBMISSION.md or the pitch outline. **Exception:** country flag emoji (🇮🇩 🇵🇭 🇻🇳) are allowed to show a customer's country.
-- **Icons** are inline SVGs from one module, `app/static/js/icons.js`. Each is 16 px with a 1.5 stroke and `currentColor`. The set: `bank`, `wallet`, `document`, `camera`, `plug`, `upload`, `warning`, `check`, `cross`, `chevron`, `signout`, `clock`. Alpine pages render them with `x-html` from these fixed strings only, never from user or model data.
+- **Icons** are inline SVGs from one module, `app/static/js/icons.js`. Each is 16 px with a 1.5 stroke and `currentColor`. The set: `bank`, `wallet`, `document`, `camera`, `plug`, `upload`, `warning`, `check`, `cross`, `chevron`, `signout`, `clock`, `refresh`. Alpine pages render them with `x-html` from these fixed strings only, never from user or model data.
 - **Tailwind stays** (Play CDN). Design tokens and component classes live in `app/static/css/app.css`. No new frontend dependency.
 
 **Palette (pastel)**
@@ -901,7 +901,7 @@ Validation:
 - Status filter tabs (segmented, rectangular): All, Needs more data, Scored, Reviewed, Error.
 - Table columns: customer name, type (individual or business, its own column in the rigid table layout), country flag, purpose, status chip, score/grade, recommendation (final recommendation if reviewed), updated time (relative).
 - Clicking a row opens `#a/{id}`.
-- Polls every 5 s.
+- **No background polling.** A **Refresh** button in the top bar (`data-testid="refresh"`) reloads the current view. No `setInterval` anywhere in the frontend, so a forgotten tab never keeps Cloud Run awake.
 
 **`#a/{id}`**, top to bottom:
 1. **Header.** Customer name, type badge, country, occupation or business type, years active, purpose, requested amount and tenor, consent ref and provider with its expiry, and a status chip.
@@ -1111,7 +1111,7 @@ All tests use `REPO_BACKEND=memory` and `GEMINI_BACKEND=stub`. No network access
 4. Deploy to Cloud Run:
    ```
    gcloud run deploy kasflow --source . --region $REGION --service-account kasflow-run@… \
-     --allow-unauthenticated --min-instances 1 --timeout 300 --memory 1Gi \
+     --allow-unauthenticated --min-instances 0 --cpu-boost --timeout 300 --memory 1Gi \
      --set-env-vars GOOGLE_CLOUD_PROJECT=…,GOOGLE_CLOUD_LOCATION=…,GEMINI_MODEL=…,PUBLIC_BASE_URL=…,FIREBASE_WEB_…=…,REPO_BACKEND=firestore,GEMINI_BACKEND=vertex \
      --set-env-vars DEMO_CLIENT_API_KEY=…,DEMO_LOGIN_KEY=…
    ```
@@ -1134,7 +1134,7 @@ All tests use `REPO_BACKEND=memory` and `GEMINI_BACKEND=stub`. No network access
 3. Enable the Google sign-in provider.
 4. Make sure `<project>.web.app` and `<project>.firebaseapp.com` are on the authorized domains list.
 
-**Keep-alive.** `--min-instances 1` keeps an instance warm through evaluation. Do not delete the project or rotate keys until evaluation ends.
+**Scale to zero (cost).** `--min-instances 0` lets Cloud Run stop the service when idle; the next request starts it again after a cold start of a few seconds (`--cpu-boost` shortens it). The frontend never polls, so idle tabs cost nothing. Do not delete the project or rotate keys until evaluation ends.
 
 ---
 

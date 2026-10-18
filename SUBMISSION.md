@@ -16,8 +16,8 @@ through running-balance arithmetic. A deterministic engine produces an explainab
 
 Gemini never computes the score.
 
-**Cloud Run.** The entire backend — REST API, pipeline and the web UI — runs as one container on Cloud Run with a
-warm minimum instance.
+**Cloud Run.** The entire backend — REST API, pipeline and the web UI — runs as one container on Cloud Run that
+scales to zero when idle, so the demo costs nothing between visits.
 
 **Firestore.** Firestore stores clients, assessments, normalized transactions and a complete audit trail of every
 client, customer, system and analyst action. Browser access is denied by security rules; all access goes through the backend.

@@ -95,3 +95,15 @@ def test_no_os_junk_files_tracked():
     tracked = subprocess.run(["git", "ls-files"], cwd=ROOT, capture_output=True, text=True).stdout.split()
     assert not [f for f in tracked if f.endswith(".DS_Store")]
     assert ".DS_Store" in (ROOT / ".gitignore").read_text().split()
+
+
+def test_no_background_polling_keeps_cloud_run_awake():
+    # Cloud Run scales to zero; a forgotten browser tab must never keep an instance alive.
+    for p in STATIC_DIR.rglob("*.js"):
+        assert "setInterval" not in p.read_text(encoding="utf-8"), p.name
+    deploy = (ROOT / "deploy.sh").read_text(encoding="utf-8")
+    assert "--min-instances 0" in deploy and "--cpu-boost" in deploy
+
+
+def test_console_has_manual_refresh(client):
+    assert 'data-testid="refresh"' in client.get("/console").text

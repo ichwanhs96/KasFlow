@@ -21,6 +21,7 @@
       </nav>
       <span class="tagline hidden lg:inline">Credit signals from any data</span>
       <div class="ml-auto flex items-center gap-3 min-w-0">
+        <button @click="refresh()" :disabled="!!busy" class="btn" data-testid="refresh" title="Load the latest data"><span class="ico" :class="busy === 'refresh' ? 'animate-spin' : ''" x-html="icon('refresh')"></span><span class="hidden sm:inline">Refresh</span></button>
         <span class="truncate text-[12px] text-slate-600" x-text="user?.email"></span>
         <button @click="logout()" class="btn"><span class="ico" x-html="icon('signout')"></span><span class="hidden sm:inline">Sign out</span></button>
       </div>

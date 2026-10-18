@@ -21,8 +21,7 @@ Alpine.data("consoleApp", () => ({
     this.user = await currentUser();
     if (!this.user) { location.href = "/"; return; }
     window.addEventListener("hashchange", () => this.navigate());
-    await this.navigate();
-    setInterval(() => this.refresh(), 5000);
+    await this.navigate();  // no background polling: Cloud Run scales to zero when nobody clicks
   },
   async navigate() {
     const m = location.hash.match(/^#a\/(.+)$/);
@@ -30,10 +29,12 @@ Alpine.data("consoleApp", () => ({
     if (m) { this.route = "detail"; this.a = null; await this.loadDetail(m[1]); }
     else { this.route = "list"; this.a = null; await this.loadList(); }
   },
-  async refresh() {
+  refresh() {
     if (this.busy) return;
-    if (this.route === "list") await this.loadList();
-    else if (this.a && this.a.status === "needs_more_data") await this.loadDetail(this.a.id, true);
+    return this.act("refresh", async () => {
+      if (this.route === "list") await this.loadList();
+      else if (this.a) await this.loadDetail(this.a.id);
+    });
   },
   async loadList() {
     try { this.list = (await api("/api/console/assessments")).items; } catch (e) { this.error = e.message; }

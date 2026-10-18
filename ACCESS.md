@@ -49,5 +49,6 @@ Before recording, check whether Vertex has a newer GA Gemini Flash model. If it 
 | `deploy.sh`, `firebase.json` rewrite | `bash -n`, `docker build` | `deploy.sh` run |
 
 ## 5. Keep it alive during evaluation
-- `--min-instances 1` is set. Don't delete the project, rotate the demo keys, or disable billing until evaluation ends.
+- Cloud Run scales to zero (`--min-instances 0`), so you pay nothing while it is idle. The first request after idle waits a few seconds for a cold start; open the demo URL once right before presenting or recording. The console never auto-refreshes, so a forgotten browser tab doesn't keep an instance running.
+- Don't delete the project, rotate the demo keys, or disable billing until evaluation ends.
 - Collection links expire after 72 hours. Judges create fresh ones from `/demo/client`.
