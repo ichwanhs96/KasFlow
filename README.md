@@ -35,7 +35,7 @@ SEED_ON_START=true .venv/bin/uvicorn app.main:app --port 8080
 Backends are selected with `REPO_BACKEND` (memory|firestore), `GEMINI_BACKEND` (stub|vertex) and `AUTH_BACKEND` (stub|firebase).
 
 ## Deploy
-See [ACCESS.md](ACCESS.md), then run `./deploy.sh <project> asia-southeast1`.
+Link billing to a GCP project, log in (`gcloud auth login`, `gcloud auth application-default login`, `npx firebase-tools@13 login`), then run `./bootstrap.sh <project-id>`. It sets up Firebase, Firestore and Cloud Run and deploys; the only manual step is one click to enable Google sign-in. Details in [ACCESS.md](ACCESS.md). Later code changes: `./deploy.sh <project-id>`.
 
 ## How scoring works
 Python computes every number: months covered, average inflow/outflow/net, income volatility, net margin, 3-month trend,

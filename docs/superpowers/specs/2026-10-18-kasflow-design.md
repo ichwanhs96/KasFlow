@@ -1096,6 +1096,16 @@ All tests use `REPO_BACKEND=memory` and `GEMINI_BACKEND=stub`. No network access
 
 ## 12. Deployment
 
+**One command (`bootstrap.sh <project> [region]`).** After billing is linked and the user has run `gcloud auth login`, `gcloud auth application-default login` and `npx firebase-tools@13 login`, `bootstrap.sh` does all setup and then calls `deploy.sh`:
+- checks billing and enables the APIs
+- adds Firebase and the Hosting site
+- registers the web app and writes `.env.deploy` (generated demo keys, `chmod 600`)
+- grants the default compute service account `roles/run.builder` for source deploys
+- waits until Google sign-in is enabled. This is the only console click, because Google doesn't allow creating that provider's OAuth client from a CLI.
+- runs `scripts/check_gemini.py`, then deploys
+
+It is idempotent. `deploy.sh` alone redeploys code changes.
+
 **`Dockerfile`**
 - Base image `python:3.12-slim`; `pip install -r requirements.txt`.
 - Copy `app/`, `data/` and `demo_assets/`, excluding the y4m.
