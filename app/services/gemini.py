@@ -7,13 +7,13 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any, Protocol
 
-from app.config import DATA_DIR, GEMINI_DEADLINE_S, GEMINI_TIMEOUT_S, JSON_PAYLOAD_MAX_BYTES, Settings
+from app.config import DATA_DIR, GEMINI_DEADLINE_S, GEMINI_EXTRACT_TIMEOUT_S, GEMINI_TIMEOUT_S, JSON_PAYLOAD_MAX_BYTES, Settings
 from app.i18n import COUNTRY, CURRENCIES, LANGUAGE_NAME
 from app.models import METRIC_KEYS, AiSummary, CsvMapping, Extraction, Point, Transaction, new_id
 from app.services import prompts
 
 CAMERA_FALLBACK_FIXTURE = "sari_buku_kas.png"
-EXTRACT_THINKING_BUDGET = 512  # small budget for handwriting/multimodal; mapping and summaries use 0 (latency)
+EXTRACT_THINKING_BUDGET = 0  # thinking off: same accuracy on the demo assets live, 7 s faster on long statements
 
 
 class GeminiError(Exception):
@@ -118,19 +118,19 @@ class VertexGemini:
             from google import genai
             from google.genai import types
 
-            client = genai.Client(vertexai=True, project=settings.project, location=settings.location,
-                                  http_options=types.HttpOptions(timeout=GEMINI_TIMEOUT_S * 1000))
+            client = genai.Client(vertexai=True, project=settings.project, location=settings.location)
         self.client = client
         self.model = settings.gemini_model
         self.sleep = sleep
         self.monotonic = monotonic
 
-    def _generate(self, contents: list, schema, thinking_budget: int = 0):
+    def _generate(self, contents: list, schema, thinking_budget: int = 0, timeout_s: int = GEMINI_TIMEOUT_S):
         from google.genai import types
 
         config = types.GenerateContentConfig(temperature=0.2, response_mime_type="application/json",
                                              response_schema=schema,
-                                             thinking_config=types.ThinkingConfig(thinking_budget=thinking_budget))
+                                             thinking_config=types.ThinkingConfig(thinking_budget=thinking_budget),
+                                             http_options=types.HttpOptions(timeout=timeout_s * 1000))
         last: Exception | None = None
         start = self.monotonic()
         for attempt in range(2):
@@ -140,7 +140,7 @@ class VertexGemini:
             except Exception as e:  # network, quota, timeout, or invalid JSON
                 last = e
                 # Retry only if a second full attempt still fits the deadline (Hosting cuts requests at 60 s).
-                if attempt == 0 and self.monotonic() - start + 2 + GEMINI_TIMEOUT_S <= GEMINI_DEADLINE_S:
+                if attempt == 0 and self.monotonic() - start + 2 + timeout_s <= GEMINI_DEADLINE_S:
                     self.sleep(2)
                 else:
                     break
@@ -152,7 +152,7 @@ class VertexGemini:
         prompt = prompts.EXTRACT_PROMPT.format(country_name=COUNTRY[country]["name"],
                                                reference_date=reference_date.isoformat())
         return self._generate([types.Part.from_bytes(data=data, mime_type=mime_type), prompt], Extraction,
-                              thinking_budget=EXTRACT_THINKING_BUDGET)
+                              thinking_budget=EXTRACT_THINKING_BUDGET, timeout_s=GEMINI_EXTRACT_TIMEOUT_S)
 
     def map_csv_columns(self, header, sample_rows, *, filename, country):
         prompt = prompts.CSV_MAPPING_PROMPT.format(country_name=COUNTRY[country]["name"],
@@ -164,7 +164,7 @@ class VertexGemini:
         raw = json.dumps(payload, ensure_ascii=False)[:JSON_PAYLOAD_MAX_BYTES]
         prompt = prompts.JSON_MAP_PROMPT.format(country_name=COUNTRY[country]["name"],
                                                 reference_date=reference_date.isoformat(), payload=raw)
-        return self._generate([prompt], Extraction)
+        return self._generate([prompt], Extraction, timeout_s=GEMINI_EXTRACT_TIMEOUT_S)
 
     def summarize(self, facts, *, purpose, language):
         prompt = prompts.SUMMARY_PROMPT.format(purpose=purpose, metric_keys=", ".join(METRIC_KEYS),

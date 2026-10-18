@@ -161,7 +161,63 @@ def test_vertex_config_disables_thinking_for_mapping_and_summary():
     assert fake.models.calls[0][2].thinking_config.thinking_budget == 0
 
 
-def test_gemini_timeout_fits_hosting_limit():
-    from app.config import GEMINI_DEADLINE_S, GEMINI_TIMEOUT_S
-    assert GEMINI_TIMEOUT_S * 2 + 2 > GEMINI_DEADLINE_S  # a slow first attempt never gets a second
-    assert GEMINI_DEADLINE_S <= 55
+def test_gemini_timeouts_fit_hosting_limit():
+    from app.config import GEMINI_DEADLINE_S, GEMINI_EXTRACT_TIMEOUT_S, GEMINI_TIMEOUT_S
+    assert GEMINI_DEADLINE_S <= 55  # Firebase Hosting cuts rewrites to Cloud Run at 60 s
+    assert GEMINI_TIMEOUT_S * 2 + 2 <= GEMINI_DEADLINE_S  # mapping/summary: a retry still fits
+    assert GEMINI_TIMEOUT_S < GEMINI_EXTRACT_TIMEOUT_S <= GEMINI_DEADLINE_S
+    assert GEMINI_EXTRACT_TIMEOUT_S >= 45  # a 62-row statement measured 23-30 s live
+
+
+def _good_extraction_json():
+    return json.dumps(ext([row("2026-09-01", 7)]).model_dump())
+
+
+def test_vertex_extraction_uses_long_timeout_and_no_thinking():
+    fake = SimpleNamespace(models=FakeModels([_good_extraction_json()]))
+    VertexGemini(Settings(), client=fake, sleep=lambda s: None).extract_document(
+        b"%PDF", "application/pdf", filename="a.pdf", country="VN", reference_date=REF)
+    cfg = fake.models.calls[0][2]
+    assert cfg.http_options.timeout == 50_000 and cfg.thinking_config.thinking_budget == 0
+
+
+def test_vertex_mapping_uses_short_timeout():
+    good = json.dumps({"date_column": "Tgl", "date_format": "%d-%m-%Y", "amount_column": "A", "debit_column": None,
+                       "credit_column": None, "direction_column": None, "direction_in_values": [],
+                       "description_column": None, "balance_column": None, "counterparty_column": None,
+                       "thousands_separator": "none", "decimal_separator": ",", "channel": "qris",
+                       "status_column": None, "success_values": []})
+    fake = SimpleNamespace(models=FakeModels([good]))
+    VertexGemini(Settings(), client=fake, sleep=lambda s: None).map_csv_columns(
+        ["Tgl"], [["01-01-2026"]], filename="x.csv", country="ID")
+    assert fake.models.calls[0][2].http_options.timeout == 25_000
+
+
+def test_extraction_fast_failure_retries_but_timeout_does_not():
+    mono = Mono()
+
+    class Clocked(FakeModels):
+        def __init__(self, outcomes, cost):
+            super().__init__(outcomes)
+            self.cost = cost
+
+        def generate_content(self, **kw):
+            mono.t += self.cost
+            return super().generate_content(**kw)
+
+    fast = SimpleNamespace(models=Clocked([RuntimeError("503"), _good_extraction_json()], cost=1))
+    VertexGemini(Settings(), client=fast, sleep=lambda s: None, monotonic=mono).extract_document(
+        b"x", "image/png", filename="a.png", country="ID", reference_date=REF)
+    assert len(fast.models.calls) == 2
+    mono.t = 0.0
+    slow = SimpleNamespace(models=Clocked([RuntimeError("504 DEADLINE_EXCEEDED"), "unused"], cost=50))
+    with pytest.raises(GeminiError):
+        VertexGemini(Settings(), client=slow, sleep=lambda s: None, monotonic=mono).extract_document(
+            b"x", "image/png", filename="a.png", country="ID", reference_date=REF)
+    assert len(slow.models.calls) == 1
+
+
+def test_vertex_json_mapping_uses_long_timeout():
+    fake = SimpleNamespace(models=FakeModels([_good_extraction_json()]))
+    VertexGemini(Settings(), client=fake, sleep=lambda s: None).map_json({"rows": [1]}, country="ID", reference_date=REF)
+    assert fake.models.calls[0][2].http_options.timeout == 50_000
