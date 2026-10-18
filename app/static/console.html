@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>KasFlow Console</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="/static/css/app.css">
+  <script src="/config.js"></script>
+  <script type="module" src="/static/js/console.js"></script>
+</head>
+<body class="bg-slate-50 text-slate-800">
+<div x-data="consoleApp" x-cloak class="min-h-screen">
+  <header class="bg-white border-b">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+      <a href="#list" class="flex items-baseline gap-2"><span class="text-xl font-bold">💧 KasFlow</span>
+        <span class="text-sm text-slate-500 hidden sm:inline">Credit signals from any data</span></a>
+      <div class="flex items-center gap-3 text-sm min-w-0"><span class="truncate" x-text="user?.email"></span>
+        <button @click="logout()" class="text-slate-500 hover:text-slate-900">Sign out</button></div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-6">
+    <p x-show="error" x-text="error" class="mb-4 rounded bg-red-50 text-red-700 px-3 py-2 text-sm"></p>
+
+    <!-- LIST -->
+    <section x-show="route==='list'">
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <h1 class="text-2xl font-semibold">Assessments</h1>
+        <div class="flex flex-wrap gap-2 text-sm">
+          <template x-for="f in filters" :key="f.key">
+            <button @click="filter=f.key" :class="filter===f.key ? 'bg-slate-900 text-white' : 'bg-white'"
+                    class="px-3 py-1 rounded-full border" x-text="f.label"></button>
+          </template>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl border overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="text-left text-slate-500 border-b"><tr>
+            <th class="p-3">Customer</th><th class="p-3">Country</th><th class="p-3">Purpose</th><th class="p-3">Status</th>
+            <th class="p-3">Score</th><th class="p-3">Recommendation</th><th class="p-3">Updated</th></tr></thead>
+          <tbody>
+            <template x-for="row in filtered" :key="row.id">
+              <tr data-testid="assessment-row" class="border-b last:border-0 hover:bg-slate-50 cursor-pointer"
+                  @click="location.hash = '#a/' + row.id">
+                <td class="p-3"><span class="font-medium" x-text="row.customer.name"></span>
+                  <span class="ml-1 text-xs px-2 py-0.5 rounded-full bg-slate-100" x-text="row.customer.type"></span></td>
+                <td class="p-3" x-text="flag(row.customer.country)"></td>
+                <td class="p-3" x-text="row.purpose"></td>
+                <td class="p-3"><span class="text-xs px-2 py-1 rounded-full" :class="statusClass(row.status)" x-text="statusLabel(row.status)"></span></td>
+                <td class="p-3" x-text="row.score === null ? '—' : row.score + ' · ' + row.grade"></td>
+                <td class="p-3"><span x-show="row.final_recommendation || row.recommendation" class="text-xs px-2 py-1 rounded-full"
+                  :class="recClass(row.final_recommendation || row.recommendation)" x-text="row.final_recommendation || row.recommendation"></span></td>
+                <td class="p-3 text-slate-500" x-text="ago(row.updated_at)"></td>
+              </tr>
+            </template>
+            <tr x-show="filtered.length === 0"><td colspan="7" class="p-6 text-center text-slate-400">No assessments yet.
+              Create one from the <a class="underline" href="/demo/client" target="_blank">demo client app</a> or the
+              <a class="underline" href="/docs" target="_blank">API</a>.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- DETAIL -->
+    <section x-show="route==='detail'">
+      <a href="#list" data-testid="back-to-list" class="text-sm text-slate-500">← All assessments</a>
+      <template x-if="a">
+        <div class="space-y-5 mt-3">
+          <div class="bg-white rounded-xl border p-5">
+            <div class="flex flex-wrap justify-between gap-3">
+              <div class="min-w-0">
+                <h1 class="text-2xl font-semibold" x-text="a.customer.name"></h1>
+                <p class="text-slate-500 text-sm"><span x-text="flag(a.customer.country)"></span> <span x-text="a.customer.type"></span> ·
+                  <span x-text="a.customer.occupation_or_business_type"></span> · <span x-text="a.customer.years_active + ' yrs active'"></span></p>
+                <p class="text-sm mt-1">Purpose: <b x-text="a.purpose"></b>
+                  <template x-if="a.requested_amount"><span> · Requested <b x-text="money(a.requested_amount)"></b> over <b x-text="a.tenor_months"></b> months</span></template></p>
+                <p class="text-xs text-slate-500 mt-1">Consent <span class="font-mono" x-text="a.consent.ref"></span> via
+                  <span x-text="a.consent.provider"></span>, valid until <span x-text="dateStr(a.consent.expires_at)"></span></p>
+              </div>
+              <span data-testid="status-chip" class="self-start text-sm px-3 py-1 rounded-full" :class="statusClass(a.status)" x-text="statusLabel(a.status)"></span>
+            </div>
+            <div x-show="a.sufficiency" class="mt-4 text-sm">
+              <div class="flex flex-wrap gap-6"><span>Months covered <b x-text="(a.sufficiency?.months_covered ?? 0) + '/6'"></b></span>
+                <span>Incoming transactions <b x-text="(a.sufficiency?.inflow_txn_count ?? 0) + '/20'"></b></span></div>
+              <ul class="text-amber-700 text-xs mt-1"><template x-for="r in (a.sufficiency?.reasons || [])"><li x-text="'• ' + r"></li></template></ul>
+            </div>
+          </div>
+
+          <div x-show="a.status === 'needs_more_data'" data-testid="collection-card" class="bg-amber-50 border border-amber-200 rounded-xl p-5">
+            <h2 class="font-semibold">More data needed</h2>
+            <p class="text-sm text-slate-600">Send the customer a secure collection link (no login, expires in 72 hours) or embed it in your app.</p>
+            <div class="mt-3 flex flex-wrap gap-2">
+              <button @click="genLink()" :disabled="!!busy" class="btn-primary">Generate link</button>
+              <button @click="scoreNow()" :disabled="!!busy" class="btn-secondary" data-testid="score-now">Score now with available data</button>
+            </div>
+            <template x-if="link">
+              <div class="mt-4 flex flex-wrap gap-4 items-start">
+                <div class="w-40 h-40 bg-white p-2 rounded" x-html="link.qr_svg"></div>
+                <div class="text-sm space-y-2 min-w-0 flex-1">
+                  <input readonly class="w-full font-mono text-xs border rounded px-2 py-1" :value="link.collection_url">
+                  <button class="btn-secondary" @click="navigator.clipboard.writeText(link.collection_url)">Copy link</button>
+                  <p class="text-xs text-slate-500">Expires <span x-text="dateStr(link.collection_expires_at)"></span></p>
+                </div>
+              </div>
+            </template>
+            <ul class="mt-3 text-sm" x-show="a.collection?.items?.length">
+              <template x-for="it in (a.collection?.items || [])"><li><span x-text="it.status === 'done' ? '✓' : '✗'"></span>
+                <span x-text="it.filename"></span> <span class="text-slate-500" x-text="it.status === 'done' ? it.txn_count + ' transactions' : 'failed'"></span></li></template>
+            </ul>
+          </div>
+
+          <div class="bg-white rounded-xl border p-5" data-testid="sources-panel">
+            <h2 class="font-semibold mb-3">Data sources <span class="text-slate-400 text-sm" x-text="'(' + a.sources.length + ')'"></span></h2>
+            <div class="space-y-3">
+              <template x-for="s in a.sources" :key="s.id">
+                <div class="border rounded-lg" data-testid="source-card">
+                  <button class="w-full flex flex-wrap items-center gap-3 p-3 text-left" data-testid="expand-source" @click="expanded[s.id] = !expanded[s.id]">
+                    <span class="text-xl" x-text="kindIcon(s.kind)"></span>
+                    <span class="font-medium" x-text="s.label"></span>
+                    <span class="text-xs px-2 py-0.5 rounded-full" :class="s.trust === 'verified' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'"
+                          x-text="s.trust === 'verified' ? 'Verified' : 'Extracted by AI'"></span>
+                    <span class="text-xs text-slate-500" x-text="s.txn_count + ' txns · ' + s.months_covered + ' months'"></span>
+                    <span x-show="s.tamper_flags.length" data-testid="tamper-badge" class="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700"
+                          x-text="'⚠ ' + s.tamper_flags.length + ' balance mismatches'"></span>
+                    <span class="ml-auto text-slate-400" x-text="expanded[s.id] ? '▲' : '▼'"></span>
+                  </button>
+                  <div x-show="expanded[s.id]" class="overflow-x-auto border-t max-h-96 overflow-y-auto">
+                    <table class="w-full text-xs">
+                      <thead class="text-slate-500"><tr><th class="p-2 text-left">Date</th><th class="p-2 text-left">Description</th>
+                        <th class="p-2 text-right">Amount</th><th class="p-2 text-right">Balance</th><th class="p-2 text-left">Note</th></tr></thead>
+                      <tbody>
+                        <template x-for="t in sourceTxns(s.id)" :key="t.id">
+                          <tr :class="rowClass(t)" :data-testid="t.tampered ? 'tampered-row' : 'txn-row'">
+                            <td class="p-2 whitespace-nowrap" x-text="t.date"></td>
+                            <td class="p-2" x-text="t.description"></td>
+                            <td class="p-2 text-right whitespace-nowrap" :class="t.direction === 'in' ? 'text-emerald-700' : 'text-rose-700'"
+                                x-text="(t.direction === 'in' ? '+' : '−') + money(t.amount)"></td>
+                            <td class="p-2 text-right whitespace-nowrap" x-text="t.balance === null ? '' : money(t.balance)"></td>
+                            <td class="p-2" x-text="rowNote(t, s)"></td>
+                          </tr>
+                        </template>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </template>
+              <p x-show="a.sources.length === 0" class="text-sm text-slate-400">No data sources yet.</p>
+            </div>
+          </div>
+
+          <div x-show="a.result" class="grid lg:grid-cols-3 gap-5">
+            <div class="bg-white rounded-xl border p-5 flex flex-col items-center" data-testid="score-card">
+              <svg viewBox="0 0 120 120" class="w-40 h-40">
+                <circle cx="60" cy="60" r="50" stroke="#e2e8f0" stroke-width="12" fill="none"></circle>
+                <circle cx="60" cy="60" r="50" :stroke="gradeColor()" stroke-width="12" fill="none" stroke-linecap="round"
+                        :stroke-dasharray="dash()" transform="rotate(-90 60 60)"></circle>
+                <text x="60" y="60" text-anchor="middle" font-size="30" font-weight="700" fill="#0f172a" x-text="a.result?.score"></text>
+                <text x="60" y="82" text-anchor="middle" font-size="12" fill="#64748b" x-text="'Grade ' + (a.result?.grade || '')"></text>
+              </svg>
+              <span data-testid="recommendation" class="mt-2 px-3 py-1 rounded-full text-sm font-semibold" :class="recClass(a.result?.recommendation)" x-text="a.result?.recommendation"></span>
+              <div class="mt-2 flex gap-2 text-xs">
+                <span x-show="a.result?.limited_data" class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">Limited data</span>
+                <span x-show="a.result?.metrics?.tamper_flag_count > 0" class="px-2 py-0.5 rounded-full bg-red-100 text-red-700">Tamper flags</span>
+              </div>
+              <div class="w-full mt-4 space-y-1 text-xs">
+                <template x-for="b in breakdown()"><div>
+                  <div class="flex justify-between"><span x-text="b.label"></span><span x-text="b.value + '/' + b.max"></span></div>
+                  <div class="h-1.5 bg-slate-100 rounded"><div class="h-1.5 rounded bg-slate-700" :style="`width:${Math.max(0, b.value) / b.max * 100}%`"></div></div>
+                </div></template>
+                <template x-for="p in penalties()"><div class="flex justify-between text-red-600"><span x-text="p.label"></span><span x-text="p.value"></span></div></template>
+              </div>
+            </div>
+            <div class="lg:col-span-2 grid sm:grid-cols-2 xl:grid-cols-3 gap-3 content-start">
+              <template x-for="m in metricCards()" :key="m.key">
+                <div :id="'metric-' + m.key" class="bg-white rounded-xl border p-3 transition"><p class="text-xs text-slate-500" x-text="m.label"></p>
+                  <p class="text-lg font-semibold" x-text="m.value"></p></div>
+              </template>
+              <div class="bg-white rounded-xl border p-3 sm:col-span-2 xl:col-span-3"><p class="text-xs text-slate-500">Affordability</p>
+                <p class="text-sm">Max monthly commitment <b x-text="money(a.result?.max_monthly_commitment)"></b>
+                  <template x-if="a.result?.installment"><span> · Installment <b x-text="money(a.result.installment)"></b></span></template>
+                  <template x-if="a.result?.suggested_max_amount"><span> · Suggested max amount <b x-text="money(a.result.suggested_max_amount)"></b></span></template></p></div>
+            </div>
+          </div>
+
+          <div x-show="a.result" class="bg-white rounded-xl border p-5"><h2 class="font-semibold mb-2">Monthly cash flow</h2>
+            <div class="h-64"><canvas id="cashflow-chart"></canvas></div></div>
+
+          <div x-show="a.result" class="bg-white rounded-xl border p-5" data-testid="ai-summary">
+            <div class="flex flex-wrap justify-between items-center gap-2"><h2 class="font-semibold">AI summary</h2>
+              <span class="text-xs text-slate-500">AI-drafted by Gemini — analyst reviews before acting</span></div>
+            <template x-if="a.result?.ai_summary">
+              <div class="mt-3 space-y-3 text-sm">
+                <p class="text-base font-medium" x-text="a.result.ai_summary.headline"></p>
+                <p x-text="a.result.ai_summary.summary"></p>
+                <div class="grid md:grid-cols-2 gap-4">
+                  <div><h3 class="font-semibold text-emerald-700">Strengths</h3><ul class="space-y-1 mt-1">
+                    <template x-for="p in a.result.ai_summary.strengths"><li>• <span x-text="p.point"></span>
+                      <button class="chip" data-testid="metric-chip" @click="highlight(p.metric)" x-text="p.metric"></button></li></template></ul></div>
+                  <div><h3 class="font-semibold text-rose-700">Risks</h3><ul class="space-y-1 mt-1">
+                    <template x-for="p in a.result.ai_summary.risks"><li>• <span x-text="p.point"></span>
+                      <button class="chip" data-testid="metric-chip" @click="highlight(p.metric)" x-text="p.metric"></button></li></template></ul></div>
+                </div>
+                <div><h3 class="font-semibold">Data notes</h3><ul><template x-for="n in a.result.ai_summary.data_notes"><li x-text="'• ' + n"></li></template></ul></div>
+                <div><h3 class="font-semibold">Next steps</h3><ul><template x-for="n in a.result.ai_summary.next_steps"><li x-text="'• ' + n"></li></template></ul></div>
+              </div>
+            </template>
+            <template x-if="a.result && !a.result.ai_summary">
+              <div class="mt-3 text-sm">Summary unavailable.
+                <button class="btn-secondary" @click="regen()" :disabled="!!busy" data-testid="regen-summary">Regenerate summary</button></div>
+            </template>
+          </div>
+
+          <div x-show="a.result?.ai_summary" class="bg-white rounded-xl border p-5">
+            <div class="flex justify-between gap-2"><h2 class="font-semibold">Customer explanation</h2>
+              <button class="btn-secondary text-xs" data-testid="toggle-explanation" @click="showLocal = !showLocal" x-text="showLocal ? 'Show English' : 'Show local language'"></button></div>
+            <p class="mt-2 text-sm whitespace-pre-line" x-text="showLocal ? a.result?.ai_summary?.customer_explanation_local : a.result?.ai_summary?.customer_explanation_en"></p>
+            <p class="text-xs text-slate-400 mt-2">Returned to the client via API for display to its customer.</p>
+          </div>
+
+          <div x-show="a.result" class="bg-white rounded-xl border p-5" data-testid="review-panel">
+            <h2 class="font-semibold">Analyst review</h2>
+            <template x-if="a.review">
+              <div data-testid="review-card" class="mt-2 text-sm space-y-1">
+                <p>Final recommendation: <span class="px-2 py-0.5 rounded-full text-xs" :class="recClass(a.review.final_recommendation)" x-text="a.review.final_recommendation"></span>
+                  (<span x-text="a.review.action"></span>)</p>
+                <p class="text-slate-500" x-text="'by ' + a.review.analyst_email + ' · ' + dateStr(a.review.at)"></p>
+                <p x-show="a.review.note" x-text="a.review.note"></p>
+              </div>
+            </template>
+            <template x-if="!a.review">
+              <div class="mt-3 space-y-3 text-sm">
+                <div class="flex flex-wrap gap-4"><label><input type="radio" value="accept" x-model="review.action"> Accept recommendation</label>
+                  <label><input type="radio" value="override" x-model="review.action" data-testid="review-override"> Override</label></div>
+                <select x-show="review.action === 'override'" x-model="review.final_recommendation" class="border rounded p-1">
+                  <option value="favorable">favorable</option><option value="review">review</option><option value="unfavorable">unfavorable</option></select>
+                <textarea x-model="review.note" placeholder="Note (optional)" class="w-full border rounded p-2"></textarea>
+                <button class="btn-primary" :disabled="!!busy" @click="submitReview()" data-testid="review-submit">Submit review</button>
+              </div>
+            </template>
+          </div>
+
+          <div class="bg-white rounded-xl border p-5"><h2 class="font-semibold mb-2">Audit trail</h2>
+            <ol class="text-xs space-y-1"><template x-for="e in a.events"><li><span class="text-slate-400" x-text="dateStr(e.at)"></span> ·
+              <span class="font-mono" x-text="e.type"></span> · <span class="text-slate-500" x-text="e.actor"></span></li></template></ol></div>
+        </div>
+      </template>
+    </section>
+  </main>
+</div>
+</body>
+</html>
