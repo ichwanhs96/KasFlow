@@ -13,7 +13,7 @@ from app.deps import Services
 from app.errors import AppError
 from app.models import utcnow
 from app.repo import FirestoreRepo, InMemoryRepo
-from app.routers import client_api
+from app.routers import client_api, collect_api, console_api, demo
 from app.services.gemini import StubGemini, VertexGemini
 from app.services.pipeline import AssessmentService
 
@@ -47,6 +47,9 @@ def create_app(settings: Settings | None = None, services: Services | None = Non
             "details": jsonable_encoder(exc.errors(), custom_encoder={Exception: str})}})
 
     app.include_router(client_api.router)
+    app.include_router(console_api.router)
+    app.include_router(collect_api.router)
+    app.include_router(demo.router)
     app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
     @app.get("/healthz", include_in_schema=False)
