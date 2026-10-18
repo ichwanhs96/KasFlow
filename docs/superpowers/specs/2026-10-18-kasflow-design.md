@@ -1,7 +1,7 @@
 # KasFlow: Design Spec
 
 - **Date:** 2026-10-18
-- **Status:** Approved in brainstorming; awaiting written-spec review
+- **Status:** Implemented (v1). Revision 2 (2026-10-18): visual redesign, see §9.0
 - **Audience:** the coding agent that will implement this, plus the human team
 
 ---
@@ -849,7 +849,46 @@ Validation:
 
 ## 9. Frontend
 
-Design: Tailwind, plus a small shared header with the KasFlow logo as text, `💧 KasFlow`, and the tagline "Credit signals from any data".
+### 9.0 Visual system (revision 2)
+
+**Why.** The first version looked AI-generated (emoji, rounded cards, bright pills). KasFlow handles sensitive financial data, so it should look like a serious trading or banking tool. The reference is the Interactive Brokers style: simple, dense and a bit rigid. It uses a **pastel** palette so it stays easy on the eye.
+
+**Rules**
+- **No emoji anywhere** in the UI, the intro and outro cards, video captions, README, SUBMISSION.md or the pitch outline. **Exception:** country flag emoji (🇮🇩 🇵🇭 🇻🇳) are allowed to show a customer's country.
+- **Icons** are inline SVGs from one module, `app/static/js/icons.js`. Each is 16 px with a 1.5 stroke and `currentColor`. The set: `bank`, `wallet`, `document`, `camera`, `plug`, `upload`, `warning`, `check`, `cross`, `chevron`, `signout`, `clock`. Alpine pages render them with `x-html` from these fixed strings only, never from user or model data.
+- **Tailwind stays** (Play CDN). Design tokens and component classes live in `app/static/css/app.css`. No new frontend dependency.
+
+**Palette (pastel)**
+
+| Token | Value | Use |
+|---|---|---|
+| `--bg` | `#F5F7FA` | page background |
+| `--panel` | `#FFFFFF` | panels |
+| `--border` | `#D9DEE7` | 1 px borders, table rules |
+| `--strip` | `#EEF2F7` | panel header strips, table headers |
+| `--topbar` | `#E3ECF8` | top bar, with a 2 px `--primary` line under it |
+| `--ink` / `--muted` | `#1F2A37` / `#667085` | text |
+| `--primary` | `#3B6FB6` (hover `#2F5C99`) | primary buttons, links, active tab |
+| `--pos-bg/-ink/-line` | `#E3F4EA` / `#1F6B45` / `#B7E0C7` | inflow, favorable, verified, done |
+| `--neg-bg/-ink/-line` | `#FBE7E6` / `#A23B32` / `#F2C2BE` | outflow, unfavorable, tamper, failed |
+| `--warn-bg/-ink/-line` | `#FDF1DC` / `#8A5A12` / `#F2D9A8` | review, needs more data, AI-extracted |
+| `--info-bg/-ink/-line` | `#E6EEF9` / `#2F5C99` / `#C3D5EE` | scored, neutral labels |
+| chart | inflow `#8CCFA8`, outflow `#F2A7A0`, net line `#3B6FB6` | Chart.js |
+
+**Components**
+- **Shape and type:** corner radius 2 px, no shadows, no gradients. System UI font at a 13 px base. Numbers use `font-variant-numeric: tabular-nums` and are right-aligned in tables.
+- **Top bar:** logo and wordmark, tab-style navigation (Assessments, API docs), and the analyst email with a sign-out icon.
+- **Panels** (`.panel`): white, with a 1 px border and a header strip holding a small, uppercase, letter-spaced title.
+- **Tables:** compact rows (about 28 px), zebra striping in `--strip` at 50%, and a sticky header inside scroll areas.
+- **Buttons** (`.btn`, `.btn-primary`): rectangular, 28–32 px tall.
+- **Labels** (`.label`, with `.label-pos` / `-neg` / `-warn` / `-info` / `-muted`): small rectangles with the pastel background and a 3 px coloured left border. They replace all pills, chips and badges. A metric chip becomes `.label-info`, rendered as a button.
+- **Score block:** replaces the ring dial. It shows the large score number, the grade, the recommendation label, and a thin 0–100 bar with tick marks at 50, 65 and 80 (the grade cut-offs). The breakdown is a compact table with a thin bar per component and penalties in `--neg-ink`.
+
+**Logo** (`app/static/img/logo.svg`, also used as the favicon)
+- **Mark:** a 24×24 rounded-2 tile in `--topbar` holding three ascending bars in blue `#4A7FC1` (data, ledger), with a green `#3FA37A` polyline across their tops ending in a small arrowhead (cash flow, growth).
+- **Wordmark:** "Kas" in `#1E3A5F` and "Flow" in `#2E8B62`, semibold.
+- **Tagline:** "Credit signals from any data", in `--muted`.
+- `<link rel="icon" href="/static/img/logo.svg" type="image/svg+xml">` goes on every page.
 
 ### 9.1 `js/firebase.js`
 - Loads the config from `/config.js`.
@@ -859,7 +898,7 @@ Design: Tailwind, plus a small shared header with the KasFlow logo as text, `�
 
 **`#list`**
 - Header with the analyst email and a sign-out button.
-- Status filter chips: All, Needs more data, Scored, Reviewed, Error.
+- Status filter tabs (segmented, rectangular): All, Needs more data, Scored, Reviewed, Error.
 - Table columns: customer (name, plus a type badge for individual or business), country flag, purpose, status chip, score/grade, recommendation (final recommendation if reviewed), updated time (relative).
 - Clicking a row opens `#a/{id}`.
 - Polls every 5 s.
@@ -873,10 +912,10 @@ Design: Tailwind, plus a small shared header with the KasFlow logo as text, `�
    - the QR code (SVG)
    - the uploaded items and their statuses
    - a "Score now with available data" button
-4. **Sources panel.** One card per source showing a kind icon (🏦 open_finance, 🔌 api_push, 📄 upload, 📷 camera), the label, a trust badge (green "Verified" or amber "Extracted by AI"), the transaction count, months covered, and a red "⚠ n balance mismatches" badge if tamper flags exist. Expanding a card shows the source's transaction table, with tampered rows highlighted red (expected vs actual) and duplicate or internal-transfer rows greyed out with a label.
+4. **Sources panel.** One card per source showing a kind icon (SVG: `bank` open_finance, `plug` api_push, `document` upload, `camera` camera), the label, a trust label (`.label-pos` "Verified" or `.label-warn` "Extracted by AI"), the transaction count, months covered, and a `.label-neg` "n balance mismatches" label with the `warning` icon if tamper flags exist. The tamper label is rendered only when flags exist (`x-if`, not `x-show`). Expanding a card shows the source's transaction table, with tampered rows highlighted red (expected vs actual) and duplicate or internal-transfer rows greyed out with a label.
 5. **Result.**
-   - A score dial (SVG ring) with the grade letter.
-   - A recommendation pill: green favorable, amber review, red unfavorable. Badges for "Limited data" and "Tamper flags".
+   - The score block (§9.0) with the grade letter.
+   - A recommendation label: `.label-pos` favorable, `.label-warn` review, `.label-neg` unfavorable. Labels for "Limited data" and "Tamper flags".
    - A breakdown bar for each component.
    - Metric cards: average monthly inflow, outflow and net (formatted in the assessment currency using `Intl.NumberFormat` with the locale for the country), income volatility, net margin, trend, returned payments, debt burden, verified share, top-payer share, and affordability (max monthly commitment; installment and coverage ratio; suggested maximum amount).
    - A Chart.js chart: monthly inflow and outflow bars plus a net line.
@@ -898,14 +937,14 @@ Design: Tailwind, plus a small shared header with the KasFlow logo as text, `�
 
 **Layout**, mobile-first, maximum width 480 px:
 - **Top:** "{client_name} is requesting additional financial information for: {purpose}", then the consent notice ("Your files are read by AI to extract transactions and are not stored."), and a "Secured by KasFlow" footer.
-- **Two large buttons:**
+- **Two large tiles** (bordered, square-cornered, with the `upload` and `camera` icons):
   - **Upload files:** `<input type=file multiple accept="application/pdf,image/png,image/jpeg,.csv,text/csv">` plus a drag-and-drop zone. Each file is uploaded sequentially.
   - **Take photo:**
     - On touch devices (`matchMedia('(pointer:coarse)')`), use `<input type=file accept="image/*" capture="environment">`.
     - Otherwise open a modal with a `<video autoplay playsinline>` from `getUserMedia({video:{facingMode:"environment"}})`, plus **Capture** and **Close** buttons.
     - **Capture** draws the frame to a `<canvas>`, calls `toBlob('image/jpeg', 0.92)`, and uploads it with `kind=camera` and filename `photo-<n>.jpg`. The modal stays open so the customer can capture several pages.
     - If camera permission is denied, show a message suggesting Upload instead.
-- **Item list:** filename or "Photo n", a spinner, then ✓ "{n} transactions read" or ✗ "Couldn't read this file — try a clearer photo" with a Remove option. Remove is client-side only: the item stays in the record but has no source. **Keep it simple: no server delete.**
+- **Item list:** filename or "Photo n", a spinner, then a `check` icon with "{n} transactions read" or a `cross` icon with "Couldn't read this file — try a clearer photo" with a Remove option. Remove is client-side only: the item stays in the record but has no source. **Keep it simple: no server delete.**
 - **Done button:** enabled once at least one item is done.
   - It POSTs `/complete` and shows a thank-you screen.
   - Then, if `window.parent !== window`, it calls `parent.postMessage({type:"kasflow:completed", assessmentId}, "*")`. The assessment ID is included in the GET response.
@@ -925,12 +964,12 @@ Each key needs a translation in en, id, fil and vi.
 ### 9.4 Demo client page (`demo/client.html`): "PinjamCepat" (fictional Indonesian lending app)
 
 **Layout.** Two columns, stacked on mobile:
-- **Left:** the client app mock, with its own orange branding, clearly a different product from KasFlow.
+- **Left:** the client app mock, with its own orange consumer-app branding, clearly a different product from KasFlow. It does **not** use the §9.0 system, but it follows the no-emoji rule: an SVG lightning-bolt mark next to "PinjamCepat", and SVG `bank` / `wallet` icons in the consent modal.
 - **Right:** the "API log" panel, dark, monospace, with pretty-printed JSON.
 - **Banner:** "Demo client app — simulates a company integrating KasFlow".
 
 **Flow:**
-1. **Form.** A persona select, defaulting to "Bu Sari — Warung, Indonesia (thin open-finance data)". The other options are "Paolo — Grab driver, Philippines (full data)" and "Linh — Online shop, Vietnam (thin data)". The form also has purpose (default `loan`), amount and tenor, prefilled per persona.
+1. **Form.** A persona select, defaulting to "Bu Sari — Warung, Indonesia (thin open-finance data)". The other options are "Paolo — Ride-hailing driver, Philippines (full data)" and "Linh — Online shop, Vietnam (thin data)". The form also has purpose (default `loan`), amount and tenor, prefilled per persona.
 2. **"Connect your accounts" button.** Opens a modal styled as a consent screen from the "OpenFinance SEA (simulated)" provider. It lists the persona's accounts and the data scope ("6 months of transactions, valid 30 days"), with Allow and Cancel buttons.
 3. **Allow.** Calls `POST /api/demo/client/apply`, and the API log shows the request and response.
 4. **Response handling:**
@@ -942,14 +981,14 @@ Each key needs a translation in en, id, fil and vi.
 
 ### 9.5 Intro and outro cards (`/demo/intro`, `/demo/outro`)
 
-Full-screen 1280×720 slides, made of static HTML.
+Full-screen 1280×720 slides, made of static HTML. They use a pastel navy-on-light layout with the KasFlow logo, and **no emoji**: points are numbered (01, 02, 03) or carry a thin SVG icon.
 
 **Intro slide:**
 - Title: "KasFlow: credit signals from any data".
 - Three stat lines:
   - "Asia-Pacific MSME credit gap: ~US$2.5 trillion (ADB, 2024)"
   - "SEA financial data is scattered across banks, e-wallets, QRIS — and paper"
-  - "Lenders, BNPL, rental & insurance all need the same answer: can this customer afford it?"
+  - "Lending, BNPL, rental & insurance all need the same answer: can this customer afford it?"
 
 **Outro slide:**
 - An architecture diagram (inline SVG boxes): Client app → KasFlow API (Cloud Run) → Firestore / Gemini, plus Firebase Hosting and Auth.
@@ -1046,6 +1085,7 @@ All tests use `REPO_BACKEND=memory` and `GEMINI_BACKEND=stub`. No network access
 | `test_adapters.py` | Open-finance mapping. Standard-format validation. `csv_mapper.apply` on `sari_qris.csv` with its fixture mapping (`GAGAL` filtered out, amounts parsed). |
 | `test_tokens.py` | Hashing. URL format. Expiry. |
 | `test_personas.py` | Golden outcomes. Sari: insufficient before uploads, then favorable with grade A or B after the stub uploads. Paolo: C/review. Linh: D/unfavorable with 2 tamper flags. |
+| `test_design.py` | Revision 2 rules: no emoji (except country flags) in `app/static/**`, `README.md`, `SUBMISSION.md`, `docs/pitch-outline.md` and `video/record_demo.ts`; the logo is served and every HTML page links the favicon; `icons.js` exports every icon name the pages use. |
 | `test_api.py` | TestClient tests. Client API auth (401). Create returns `needs_more_data` and a `collection_url` for Sari. Create returns `scored` for Paolo. Collect GET; invalid link 404; expired link 410 (by monkeypatching the clock); bad MIME type 422; item upload; complete then scored. The console API rejects a missing token (dependency override for valid tokens). Review accept and override. Pushing a source with `standard` and with `auto`. `frame-ancestors` header on `/c/{token}`. |
 
 **Live checks (not in CI):**
@@ -1112,18 +1152,18 @@ All tests use `REPO_BACKEND=memory` and `GEMINI_BACKEND=stub`. No network access
 - **Use one context and one page for the whole run**, so the output is a single webm.
 
 **Helpers**
-- **`caption(page, text)`:** removes any existing caption, then injects a fixed bottom-centre bar (black at 75% opacity, white 22 px text, rounded). It must be re-applied after every `goto`, so wrap navigation in a `go(url, caption)` helper.
+- **`caption(page, text)`:** removes any existing caption, then injects a fixed bottom-centre bar (navy `#1E3A5F` at 92% opacity, white 20 px text, square corners, a 3 px `#3FA37A` left border, `pointer-events: none` so it never blocks clicks). It must be re-applied after every `goto`, so wrap navigation in a `go(url, caption)` helper.
 - **`pause(ms)`:** reading time for viewers. This is allowed only in the video script.
 - **Waits:** always `await expect(locator).toBeVisible({timeout: 60000})`, never fixed waits for app state.
 
-**Scenes** (target 3:30; tune `PACE` so the total lands between 3:15 and 3:45)
+**Scenes** (target 3:20–3:30; `BASE_PACE` 1.65 stretches all pauses, and `PACE` fine-tunes so the total lands between 3:00 and 4:00)
 
 | # | Scene | Actions | Caption(s) |
 |---|---|---|---|
 | 1 | Intro | `go(/demo/intro)`, pause 12 s | "KasFlow — credit signals from any data" |
 | 2 | Client applies | `go(/demo/client)`, Sari persona, Connect accounts → consent modal → Allow; wait for the API log response with `needs_more_data`; scroll the log | "A client app (PinjamCepat) calls the KasFlow API with open-finance consent" → "Open-finance data is thin: KasFlow asks for more, via an embeddable page" |
 | 3 | Upload | `frameLocator('#kasflow-frame')`: `setInputFiles` on `sari_dompetku.png`, wait for "transaksi terbaca"; then `sari_qris.csv` | "Customer adds an e-wallet screenshot and a QRIS export — Gemini reads any format" |
-| 4 | Camera | Click "Ambil foto", wait 2 s for the preview (fake webcam showing the ledger), click "Ambil", wait for the item status ✓; close the modal | "No digital records? Photograph the paper cash book — Gemini reads handwriting" |
+| 4 | Camera | Click "Ambil foto", wait 2 s for the preview (fake webcam showing the ledger), click "Ambil", wait for the item status "done"; close the modal | "No digital records? Photograph the paper cash book — Gemini reads handwriting" |
 | 5 | Done | Click "Selesai"; wait for the parent page to show "Data diterima"; wait for the API log to show `scored` | "Re-scored automatically; the client gets the result by API" |
 | 6 | Console | `go(/demo-login?key=…)`, which redirects to `/console`; open Bu Sari's row | "Analysts review in the KasFlow console (Google sign-in)" |
 | 7 | Sources | Scroll to the sources panel; expand the bank source to show the duplicate and internal-transfer rows | "4 sources merged: verified vs AI-extracted, duplicates & transfers removed" |
@@ -1161,7 +1201,7 @@ All tests use `REPO_BACKEND=memory` and `GEMINI_BACKEND=stub`. No network access
 - A brief description of about 200 words.
 - An explicit paragraph each for **Firebase** (Auth and Hosting), **Firestore**, **Cloud Run** and **Gemini**, using the roles in §1.
 
-**`docs/pitch-outline.md`**: content for each slide, to paste into the organiser's template:
+**`docs/pitch-outline.md`**: content for each slide, to paste into the organiser's template. No emoji in any of these documents (§9.0).
 1. **Problem:** the US$2.5T APAC MSME credit gap (ADB 2024); thin-file customers.
 2. **Insight:** the data exists but is scattered (open finance, e-wallets, QRIS, paper).
 3. **Solution:** KasFlow, credit signals from any data.
@@ -1170,7 +1210,7 @@ All tests use `REPO_BACKEND=memory` and `GEMINI_BACKEND=stub`. No network access
 6. **Trust and safety:** consent references; tokenized, expiring links; files not stored; deterministic scoring; tamper detection; human-in-the-loop; no protected attributes.
 7. **Google stack:** Gemini, Cloud Run, Firestore, Firebase.
 8. **Business model:** a per-assessment B2B fee; embeddable within a day.
-9. **Market:** SEA lenders, BNPL, rental and insurance.
+9. **Market:** SEA lending companies, BNPL, rental and insurance.
 10. **Roadmap:** real rails, webhooks, more document types, fairness monitoring.
 11. **Team.**
 
