@@ -35,8 +35,7 @@ def test_bootstrap_never_commits_secrets():
 
 def test_local_deploy_files_are_gitignored():
     ignored = (ROOT / ".gitignore").read_text(encoding="utf-8").split()
-    for name in ("bootstrap.sh", "deploy.sh", "scripts/seed.py", "scripts/smoke.py", "scripts/check_gemini.py", "ACCESS.md",
-                 "infra/billing_cap/"):
+    for name in ("bootstrap.sh", "deploy.sh", "scripts/seed.py", "scripts/smoke.py", "scripts/check_gemini.py", "ACCESS.md"):
         assert name in ignored, name
 
 
@@ -44,8 +43,9 @@ def test_deploy_runs_a_single_instance_at_most():
     assert "--max-instances 1" in local_script("deploy.sh").read_text(encoding="utf-8")
 
 
-def test_bootstrap_sets_up_the_billing_shutoff():
+def test_bootstrap_has_no_billing_shutoff():
+    # The spend cap is set in the Cloud Billing console instead (see ACCESS.md), so bootstrap must not unlink billing.
     text = local_script("bootstrap.sh").read_text(encoding="utf-8")
-    for needle in ("pubsub topics create", "kasflow-billing-cap", "functions deploy", "roles/billing.projectManager",
-                   "infra/billing_cap"):
-        assert needle in text, needle
+    for gone in ("billing-cap", "billing_cap", "functions deploy", "roles/billing.projectManager", "pubsub"):
+        assert gone not in text, gone
+    assert 'step "8/8 ' in text and "/9 " not in text

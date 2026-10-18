@@ -153,7 +153,6 @@ kasflow/
   Dockerfile
   firebase.json, .firebaserc, firestore.rules
   bootstrap.sh, deploy.sh  # [local-only] one-command setup + deploy (§12)
-  infra/billing_cap/       # [local-only] budget-triggered billing shutoff function
   ACCESS.md                # [local-only] deploy runbook
   .env.example
   README.md, SUBMISSION.md
@@ -1117,7 +1116,7 @@ All tests use `REPO_BACKEND=memory` and `GEMINI_BACKEND=stub`. No network access
 | `test_design.py` | Revision 2 rules: no emoji (except country flags) in `app/static/**`, `README.md`, `SUBMISSION.md`, `docs/pitch-outline.md` and `video/record_demo.ts`; the logo is served and every HTML page links the favicon; `icons.js` exports every icon name the pages use. |
 | `test_ratelimit.py` | Sliding window (5/min) and recovery. Daily cap per UTC day, with midnight reset. A minute-limited call doesn't spend the daily budget. Uploads over the limit return 429 (`rate_limited` / `daily_limit_reached`) without using up an item. Summaries over the limit become `summary_failed`. Only live Gemini is wrapped. |
 | `test_gemini.py` (rev 3) | Timeouts fit the Hosting limit. Extraction and `map_json` use 50 s, mapping uses 25 s. Thinking budget is 0. A fast failure retries; a slow timeout doesn't. |
-| `test_deploy_scripts.py`, `test_billing_cap.py` | Local-only, so they skip on a clean clone. Scripts parse and are executable. `deploy.sh` uses `--min-instances 0 --max-instances 1 --cpu-boost`. `bootstrap.sh` sets up the billing shutoff. The shutoff unlinks billing only at or over budget. |
+| `test_deploy_scripts.py` | Local-only, so it skips on a clean clone. Scripts parse and are executable. `deploy.sh` uses `--min-instances 0 --max-instances 1 --cpu-boost`. `bootstrap.sh` has 8 steps and never touches billing (the spend cap lives in Cloud Billing). |
 | `test_api.py` | TestClient tests. Client API auth (401). Create returns `needs_more_data` and a `collection_url` for Sari. Create returns `scored` for Paolo. Collect GET; invalid link 404; expired link 410 (by monkeypatching the clock); bad MIME type 422; item upload; complete then scored. The console API rejects a missing token (dependency override for valid tokens). Review accept and override. Pushing a source with `standard` and with `auto`. `frame-ancestors` header on `/c/{token}`. |
 
 **Browser check:** `video/check_pages.ts` opens every page, including the cost slide, and fails on:
@@ -1151,7 +1150,7 @@ It is idempotent. `deploy.sh` alone redeploys code changes.
   - summaries degrade to `summary_failed`, and the analyst can use Regenerate summary.
 - **50 Gemini calls per day:** a daily cap (`GEMINI_DAILY_CAP`, default 50, about 12 full Sari demos) is checked after the per-minute limit. It's counted in Firestore (`usage/gemini-YYYY-MM-DD`, a transactional increment), so instance restarts don't reset it. It resets at 00:00 UTC. Once reached, uploads return `429 daily_limit_reached`, and the collection page explains it in the customer's language.
 - **No Vertex-side cap:** Gemini 2.5 Flash uses Dynamic Shared Quota, so there's no per-project quota to lower.
-- **Billing shutoff:** `bootstrap.sh` deploys a Pub/Sub-triggered function (`infra/billing_cap`, local-only) that unlinks billing when the budget's cost reaches its amount. The user creates the $10 budget, excludes credits from it, and connects the budget to topic `kasflow-billing-cap`.
+- **Spend cap:** a $10/month spend cap and budget alerts (50/90/100%, credits excluded) are set by the owner in the Cloud Billing console. `bootstrap.sh` doesn't touch billing.
 
 **`Dockerfile`**
 - Base image `python:3.12-slim`; `pip install -r requirements.txt`.

@@ -21,4 +21,3 @@ scripts/seed.py
 scripts/smoke.py
 scripts/check_gemini.py
 ACCESS.md
-infra/billing_cap/

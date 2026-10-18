@@ -42,7 +42,7 @@ KasFlow runs on Google Cloud:
 - **Vertex AI Gemini:** document extraction, CSV/JSON mapping and explanations.
 - **Firebase Authentication:** Google sign-in for analysts.
 
-Cost guardrails: at most one Cloud Run instance, at most 5 Gemini calls per minute (`GEMINI_RPM`) and 50 per day (`GEMINI_DAILY_CAP`, counted in Firestore), and a budget-triggered billing shutoff.
+Cost guardrails: at most one Cloud Run instance, at most 5 Gemini calls per minute (`GEMINI_RPM`) and 50 per day (`GEMINI_DAILY_CAP`, counted in Firestore). A $10 monthly spend cap and budget alerts are set in Cloud Billing.
 
 Production settings: `REPO_BACKEND=firestore`, `GEMINI_BACKEND=vertex`, `AUTH_BACKEND=firebase`, plus the `GOOGLE_CLOUD_*`, `FIREBASE_WEB_*` and demo-key variables listed in `.env.example`.
 
@@ -66,7 +66,7 @@ Measured live on Gemini 2.5 Flash (Vertex AI) in October 2026, running each demo
 **Demo guardrails**
 - one Cloud Run instance at most
 - 5 Gemini calls per minute and 50 per day
-- a $10 budget with an automatic billing shutoff
+- a $10 monthly spend cap with budget alerts, set in Cloud Billing
 
 ## How scoring works
 Python computes every number: months covered, average inflow/outflow/net, income volatility, net margin, 3-month trend,
