@@ -121,8 +121,8 @@
                     <span class="text-xs px-2 py-0.5 rounded-full" :class="s.trust === 'verified' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'"
                           x-text="s.trust === 'verified' ? 'Verified' : 'Extracted by AI'"></span>
                     <span class="text-xs text-slate-500" x-text="s.txn_count + ' txns · ' + s.months_covered + ' months'"></span>
-                    <span x-show="s.tamper_flags.length" data-testid="tamper-badge" class="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700"
-                          x-text="'⚠ ' + s.tamper_flags.length + ' balance mismatches'"></span>
+                    <template x-if="s.tamper_flags.length"><span data-testid="tamper-badge" class="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700"
+                          x-text="'⚠ ' + s.tamper_flags.length + ' balance mismatches'"></span></template>
                     <span class="ml-auto text-slate-400" x-text="expanded[s.id] ? '▲' : '▼'"></span>
                   </button>
                   <div x-show="expanded[s.id]" class="overflow-x-auto border-t max-h-96 overflow-y-auto">
