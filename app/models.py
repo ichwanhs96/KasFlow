@@ -238,7 +238,7 @@ class CsvMapping(BaseModel):
     description_column: str | None
     balance_column: str | None
     counterparty_column: str | None
-    thousands_separator: Literal[".", ",", " ", ""]
+    thousands_separator: Literal[".", ",", " ", "none"]
     decimal_separator: Literal[".", ","]
     channel: Channel
     status_column: str | None

@@ -34,7 +34,7 @@ def parse_amount(raw: str, m: CsvMapping) -> Decimal | None:
     s = s.replace(" ", "").replace(" ", "")
     negative = s.startswith("-") or (s.startswith("(") and s.endswith(")"))
     s = s.strip("-()+")
-    if m.thousands_separator:
+    if m.thousands_separator and m.thousands_separator != "none":
         s = s.replace(m.thousands_separator, "")
     if m.decimal_separator == ",":
         s = s.replace(",", ".")
@@ -58,7 +58,7 @@ def apply(header: list[str], rows: list[list[str]], m: CsvMapping, *, source_id:
     success = {v.strip().lower() for v in m.success_values}
     ins = {v.strip().lower() for v in m.direction_in_values}
     out: list[Transaction] = []
-    for row in rows:
+    for i, row in enumerate(rows):
         if m.status_column and success and col(row, m.status_column).lower() not in success:
             continue
         try:
@@ -87,5 +87,5 @@ def apply(header: list[str], rows: list[list[str]], m: CsvMapping, *, source_id:
         out.append(Transaction(
             id=new_id(), date=d, amount=amount, direction=direction, description=col(row, m.description_column),
             channel=m.channel, counterparty=col(row, m.counterparty_column) or None, balance=balance,
-            currency=currency, kind="normal", source_id=source_id, row_index=len(out)))
+            currency=currency, kind="normal", source_id=source_id, row_index=i))
     return out

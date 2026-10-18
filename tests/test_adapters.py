@@ -56,7 +56,7 @@ def test_csv_mapper_qris_filters_failed_and_parses_amounts():
     txns = csv_mapper.apply(header, rows, QRIS_MAPPING, source_id="q", currency="IDR")
     assert [t.amount for t in txns] == [Decimal("1250000"), Decimal("980500")]
     assert all(t.direction == "in" and t.channel == "qris" for t in txns)
-    assert [t.row_index for t in txns] == [0, 1]
+    assert [t.row_index for t in txns] == [0, 2]
 
 
 def test_parse_csv_handles_bom_cp1252_and_symbols():
@@ -85,3 +85,15 @@ def test_csv_debit_credit_columns_and_bad_rows_skipped():
     txns = csv_mapper.apply(header, rows, m, source_id="b", currency="PHP")
     assert [(t.direction, t.amount, t.balance) for t in txns] == [
         ("in", Decimal("100.00"), Decimal("1100.00")), ("out", Decimal("50.00"), Decimal("1050.00"))]
+
+
+def test_csv_row_index_keeps_original_position_and_none_separator():
+    data = ("Tgl Transaksi;Nominal (Rp);Status;Keterangan;ID Merchant\n"
+            "01-04-2026;1250000;BERHASIL;a;x\n02-04-2026;250000;GAGAL;b;x\n03-04-2026;980500;BERHASIL;c;x\n").encode()
+    header, rows = csv_mapper.parse_csv(data)
+    m = QRIS_MAPPING.model_copy(update={"thousands_separator": "none"})
+    txns = csv_mapper.apply(header, rows, m, source_id="q", currency="IDR")
+    assert [t.row_index for t in txns] == [0, 2]
+    assert [t.amount for t in txns] == [Decimal("1250000"), Decimal("980500")]
+    with pytest.raises(Exception):
+        CsvMapping.model_validate({**QRIS_MAPPING.model_dump(), "thousands_separator": ""})

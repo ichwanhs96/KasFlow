@@ -42,3 +42,9 @@ def test_build_source_counts_and_flags():
     s = build_source(id="s9", kind="upload", label="Upload: x.pdf", trust="extracted", txns=txns, now=T0)
     assert s.txn_count == 2 and s.months_covered == 1 and len(s.tamper_flags) == 1
     assert months_covered([tx("2026-08-01", 1), tx("2026-09-01", 1), tx("2026-09-05", 1)]) == 2
+
+
+def test_dropped_row_gap_resets_chain():
+    # Row 1 was dropped during extraction (bad date); rows 0 and 2 must not be compared.
+    rows = [tx("2026-09-01", 100, balance=1100, row=0), tx("2026-09-03", 50, balance=1190, row=2)]
+    assert check(rows) == []

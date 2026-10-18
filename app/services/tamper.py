@@ -12,6 +12,8 @@ def _flags_in_order(rows: list[Transaction]) -> list[TamperFlag]:
         if t.balance is None:
             prev = None
             continue
+        if prev is not None and abs(t.row_index - prev.row_index) != 1:
+            prev = None  # a row between these two was dropped during extraction; the chain can't be checked
         if prev is not None:
             expected = prev.balance + t.amount if t.direction == "in" else prev.balance - t.amount
             if abs(expected - t.balance) > TOLERANCE:

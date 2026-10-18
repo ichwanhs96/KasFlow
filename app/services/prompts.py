@@ -35,7 +35,7 @@ Rules:
 - date_column and date_format (Python strftime, e.g. %d-%m-%Y) are required.
 - Use amount_column for a single amount column; otherwise debit_column (money out) and credit_column (money in).
 - direction_column and direction_in_values only if a separate column says in/out (e.g. CR/DR, Masuk/Keluar); else null and [].
-- thousands_separator/decimal_separator: Indonesian & Vietnamese exports use "." thousands and "," decimals;
+- thousands_separator ("none" if the amounts have no thousands separator)/decimal_separator: Indonesian & Vietnamese exports use "." thousands and "," decimals;
   Philippine exports use "," thousands and "." decimals.
 - channel: "qris" for QRIS merchant reports, "ewallet" for e-wallets, "bank" for bank exports, else "other".
 - status_column and success_values: if a status column exists, list the values meaning success (e.g. BERHASIL, SUCCESS);

@@ -7,12 +7,13 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any, Protocol
 
-from app.config import DATA_DIR, GEMINI_TIMEOUT_S, JSON_PAYLOAD_MAX_BYTES, Settings
+from app.config import DATA_DIR, GEMINI_DEADLINE_S, GEMINI_TIMEOUT_S, JSON_PAYLOAD_MAX_BYTES, Settings
 from app.i18n import COUNTRY, CURRENCIES, LANGUAGE_NAME
 from app.models import METRIC_KEYS, AiSummary, CsvMapping, Extraction, Point, Transaction, new_id
 from app.services import prompts
 
 CAMERA_FALLBACK_FIXTURE = "sari_buku_kas.png"
+EXTRACT_THINKING_BUDGET = 512  # small budget for handwriting/multimodal; mapping and summaries use 0 (latency)
 
 
 class GeminiError(Exception):
@@ -33,7 +34,7 @@ def extraction_to_transactions(ext: Extraction, *, source_id: str, currency: str
     earliest = reference_date - timedelta(days=730)
     cur = ext.currency.upper() if ext.currency and ext.currency.upper() in CURRENCIES else currency
     out: list[Transaction] = []
-    for r in ext.rows:
+    for i, r in enumerate(ext.rows):
         try:
             d = date.fromisoformat(r.date)
         except ValueError:
@@ -45,7 +46,7 @@ def extraction_to_transactions(ext: Extraction, *, source_id: str, currency: str
             description=(r.description or "").strip(), channel=ext.channel,
             counterparty=(r.counterparty or "").strip() or None,
             balance=Decimal(str(r.balance)) if r.balance is not None else None, currency=cur, kind=r.kind,
-            source_id=source_id, row_index=len(out)))
+            source_id=source_id, row_index=i))
     return out
 
 
@@ -112,7 +113,7 @@ class StubGemini:
 class VertexGemini:
     """Real Gemini on Vertex AI. Unit-tested with a fake client; verified live in Phase B (scripts/check_gemini.py)."""
 
-    def __init__(self, settings: Settings, client=None, sleep=time.sleep) -> None:
+    def __init__(self, settings: Settings, client=None, sleep=time.sleep, monotonic=time.monotonic) -> None:
         if client is None:
             from google import genai
             from google.genai import types
@@ -122,21 +123,27 @@ class VertexGemini:
         self.client = client
         self.model = settings.gemini_model
         self.sleep = sleep
+        self.monotonic = monotonic
 
-    def _generate(self, contents: list, schema):
+    def _generate(self, contents: list, schema, thinking_budget: int = 0):
         from google.genai import types
 
         config = types.GenerateContentConfig(temperature=0.2, response_mime_type="application/json",
-                                             response_schema=schema)
+                                             response_schema=schema,
+                                             thinking_config=types.ThinkingConfig(thinking_budget=thinking_budget))
         last: Exception | None = None
+        start = self.monotonic()
         for attempt in range(2):
             try:
                 resp = self.client.models.generate_content(model=self.model, contents=contents, config=config)
                 return schema.model_validate_json(resp.text)
             except Exception as e:  # network, quota, timeout, or invalid JSON
                 last = e
-                if attempt == 0:
+                # Retry only if a second full attempt still fits the deadline (Hosting cuts requests at 60 s).
+                if attempt == 0 and self.monotonic() - start + 2 + GEMINI_TIMEOUT_S <= GEMINI_DEADLINE_S:
                     self.sleep(2)
+                else:
+                    break
         raise GeminiError(f"Gemini call failed: {last}") from last
 
     def extract_document(self, data, mime_type, *, filename, country, reference_date):
@@ -144,7 +151,8 @@ class VertexGemini:
 
         prompt = prompts.EXTRACT_PROMPT.format(country_name=COUNTRY[country]["name"],
                                                reference_date=reference_date.isoformat())
-        return self._generate([types.Part.from_bytes(data=data, mime_type=mime_type), prompt], Extraction)
+        return self._generate([types.Part.from_bytes(data=data, mime_type=mime_type), prompt], Extraction,
+                              thinking_budget=EXTRACT_THINKING_BUDGET)
 
     def map_csv_columns(self, header, sample_rows, *, filename, country):
         prompt = prompts.CSV_MAPPING_PROMPT.format(country_name=COUNTRY[country]["name"],

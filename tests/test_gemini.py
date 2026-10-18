@@ -29,7 +29,7 @@ def test_extraction_post_processing_drops_bad_rows():
              row("2026-09-02", 0), row("2026-09-03", -4), row("2026-09-04", 12.5, "out", counterparty=" Shop ")])
     txns = extraction_to_transactions(e, source_id="s", currency="PHP", reference_date=REF)
     assert [t.amount for t in txns] == [Decimal("100"), Decimal("12.5")]
-    assert [t.row_index for t in txns] == [0, 1]
+    assert [t.row_index for t in txns] == [0, 6]
     assert txns[0].description == "x" and txns[1].counterparty == "Shop" and txns[0].channel == "ewallet"
     assert txns[0].currency == "IDR"
     assert extraction_to_transactions(ext([row("2026-09-01", 1)], currency="Rp"), source_id="s", currency="PHP",
@@ -116,3 +116,52 @@ def test_prompts_format_without_key_errors():
     assert "{" in prompts.JSON_MAP_PROMPT.format(country_name="Vietnam", reference_date="2026-10-18", payload="{}")
     assert "Filipino" in prompts.SUMMARY_PROMPT.format(purpose="loan", metric_keys="a, b", language_name="Filipino",
                                                        json="{}")
+
+
+def test_dropped_rows_keep_original_positions():
+    e = ext([row("2026-09-01", 100, balance=1100), row("bad", 40, balance=1140), row("2026-09-03", 50, balance=1190)])
+    txns = extraction_to_transactions(e, source_id="s", currency="IDR", reference_date=REF)
+    assert [t.row_index for t in txns] == [0, 2]
+    from app.services.tamper import check
+    assert check(txns) == []
+
+
+class Mono:
+    def __init__(self):
+        self.t = 0.0
+
+    def __call__(self):
+        return self.t
+
+
+def test_vertex_skips_retry_when_deadline_would_pass():
+    mono = Mono()
+
+    class SlowFail(FakeModels):
+        def generate_content(self, **kw):
+            mono.t += 30  # first attempt burned 30 s before failing
+            return super().generate_content(**kw)
+
+    fake = SimpleNamespace(models=SlowFail([RuntimeError("timeout"), "unused"]))
+    g = VertexGemini(Settings(), client=fake, sleep=lambda s: None, monotonic=mono)
+    with pytest.raises(GeminiError):
+        g.map_csv_columns(["Tgl"], [["01-01-2026"]], filename="x.csv", country="ID")
+    assert len(fake.models.calls) == 1
+
+
+def test_vertex_config_disables_thinking_for_mapping_and_summary():
+    good = json.dumps({"date_column": "Tgl", "date_format": "%d-%m-%Y", "amount_column": "A", "debit_column": None,
+                       "credit_column": None, "direction_column": None, "direction_in_values": [],
+                       "description_column": None, "balance_column": None, "counterparty_column": None,
+                       "thousands_separator": "none", "decimal_separator": ",", "channel": "qris",
+                       "status_column": None, "success_values": []})
+    fake = SimpleNamespace(models=FakeModels([good]))
+    VertexGemini(Settings(), client=fake, sleep=lambda s: None).map_csv_columns(
+        ["Tgl"], [["01-01-2026"]], filename="x.csv", country="ID")
+    assert fake.models.calls[0][2].thinking_config.thinking_budget == 0
+
+
+def test_gemini_timeout_fits_hosting_limit():
+    from app.config import GEMINI_DEADLINE_S, GEMINI_TIMEOUT_S
+    assert GEMINI_TIMEOUT_S * 2 + 2 > GEMINI_DEADLINE_S  # a slow first attempt never gets a second
+    assert GEMINI_DEADLINE_S <= 55
