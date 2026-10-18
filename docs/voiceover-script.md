@@ -30,13 +30,13 @@ Read this over `video/kasflow-demo.mp4` (3:37). Each part starts when its on-scr
 > Across Asia-Pacific, small businesses face a credit gap of around two and a half trillion dollars. / In Southeast Asia, their financial history isn't missing. It's scattered across banks, e-wallets, QRIS payments / and paper cash books. / This is KasFlow: credit signals from any data.
 
 ### 2. A client applies (0:20–0:34)
-> PinjamCepat is a lending app that uses KasFlow. / Bu Sari runs a warung in Indonesia. She connects her accounts through open finance / and gives consent. / PinjamCepat's backend makes a single call to the KasFlow API.
+> PinjamCepat, a lending app, uses KasFlow. / Bu Sari runs a warung in Indonesia. She connects her accounts through open finance and gives consent. / PinjamCepat makes one call to the KasFlow API.
 
 ### 3. Not enough data (0:34–0:47)
-> KasFlow fetches her open-finance data first. / But it only covers three months, so KasFlow returns a secure collection link / and PinjamCepat embeds it right inside its own app. / No login, and it expires in seventy-two hours.
+> KasFlow fetches her open-finance data first. / It only covers three months, so KasFlow returns a secure link / that PinjamCepat embeds in its own app. / No login needed.
 
 ### 4. Uploads (0:47–0:59)
-> Sari adds what she has: / a screenshot from her e-wallet, / and a QRIS settlement export. / Gemini reads any format. Images, PDFs, CSVs with columns it has never seen.
+> Sari adds what she has: / an e-wallet screenshot / and a QRIS settlement export. / Gemini reads any format: images, PDFs, CSVs it has never seen.
 
 ### 5. Camera (0:59–1:15)
 > Much of her business still lives on paper. / So she simply photographs her handwritten cash book. / Gemini reads the handwriting and turns every line into a transaction. / *[Each file shows how many transactions were read, so she knows it worked.]*
@@ -48,7 +48,7 @@ Read this over `video/kasflow-demo.mp4` (3:37). Each part starts when its on-scr
 > On the other side, analysts review every assessment in the KasFlow console.
 
 ### 8. Sources (1:35–1:49)
-> Four sources, merged into one picture. / Open-finance data is marked as verified, uploads as extracted by AI. / Duplicates across sources and transfers between her own accounts are detected and excluded, / so nothing is counted twice.
+> Four sources, merged into one picture. / Open-finance data is marked verified; uploads, extracted by AI. / Duplicates and transfers between her own accounts are detected and excluded, / so nothing is counted twice.
 
 ### 9. Score and AI summary (1:49–2:19)
 > The score itself is deterministic. / Plain Python computes cash-flow stability, margin, trend, returned payments, debt burden and data trust, / and the same data always gives the same result. / *[Sari's thin file turns into a favorable result.]* / Gemini never decides the score. It explains it. / Every strength and risk cites the exact metric behind it. One click takes you there. / And the customer gets the same explanation in her own language.
@@ -57,7 +57,7 @@ Read this over `video/kasflow-demo.mp4` (3:37). Each part starts when its on-scr
 > A human makes the final call. / The analyst accepts or overrides, / and every step is recorded in the audit trail.
 
 ### 11. Tampering (2:29–2:45)
-> Now Linh, an online shop owner in Vietnam. / She uploaded a bank statement with inflated amounts. / KasFlow checks the running balance on every row, / and the arithmetic doesn't add up. / Two rows are flagged, and the assessment comes back unfavorable.
+> Linh, an online shop owner in Vietnam. / Her bank statement has inflated amounts. / KasFlow checks the running balance on every row, / and the arithmetic doesn't add up. / Two rows are flagged, and the result is unfavorable.
 
 ### 12. API (2:45–2:59)
 > Any company can integrate KasFlow, whether lending, BNPL, rental or insurance. / Create an assessment, push extra data, / or embed the hosted collection page. / It's a simple REST API.
@@ -73,6 +73,7 @@ Read this over `video/kasflow-demo.mp4` (3:37). Each part starts when its on-scr
 ## Recording tips
 - Record each part as its own take so you can slide it onto its caption in the editor.
 - If a part runs long, cut the *[bracketed]* line first, then shorten the pause before the last sentence.
+- **Fit:** read at about 140 words per minute, every part's main text fits its scene. In parts 5 and 13 the bracketed line only fits if you read briskly, so skip it otherwise.
 - Part 9 is the longest scene (30 s). If you finish early, let the AI-summary panel stay on screen without filling the gap.
 - **Stub mode:** the current recording was made in local stub mode, so its AI-summary panel shows placeholder text ("stub summary, Gemini not called"). After deploying with real Gemini, re-record the video for submission:
   ```
