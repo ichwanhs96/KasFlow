@@ -1,10 +1,14 @@
 import Alpine from "https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/module.esm.js";
 import { api, currentUser, signOut } from "/static/js/firebase.js";
+import { icon as svgIcon } from "/static/js/icons.js";
 
 const FLAGS = { ID: "🇮🇩", PH: "🇵🇭", VN: "🇻🇳" };
 const LOCALE = { ID: "id-ID", PH: "en-PH", VN: "vi-VN" };
 const STATUS = { created: "Created", needs_more_data: "Needs more data", scored: "Scored", reviewed: "Reviewed", error: "Error" };
-const ICON = { open_finance: "🏦", api_push: "🔌", upload: "📄", camera: "📷" };
+const KIND_ICON = { open_finance: "bank", api_push: "plug", upload: "document", camera: "camera" };
+const STATUS_CLASS = { needs_more_data: "label-warn", scored: "label-info", reviewed: "label-pos", error: "label-neg" };
+const REC_CLASS = { favorable: "label-pos", review: "label-warn", unfavorable: "label-neg" };
+const GRADE_FILL = { A: "fill-pos", B: "fill-pos", C: "fill-warn", D: "fill-neg" };
 let chart = null;
 
 Alpine.data("consoleApp", () => ({
@@ -61,19 +65,13 @@ Alpine.data("consoleApp", () => ({
   },
   async logout() { await signOut(); location.href = "/"; },
 
-  flag(c) { return FLAGS[c] || c; },
-  kindIcon(k) { return ICON[k] || "•"; },
+  icon(name, size) { return svgIcon(name, size); },
+  flag(c) { return FLAGS[c] || ""; },
+  kindIcon(k) { return KIND_ICON[k] || "document"; },
   statusLabel(s) { return STATUS[s] || s; },
-  statusClass(s) {
-    return { needs_more_data: "bg-amber-100 text-amber-800", scored: "bg-sky-100 text-sky-800",
-             reviewed: "bg-emerald-100 text-emerald-800", error: "bg-red-100 text-red-700" }[s] || "bg-slate-100 text-slate-700";
-  },
-  recClass(r) {
-    return { favorable: "bg-emerald-100 text-emerald-800", review: "bg-amber-100 text-amber-800",
-             unfavorable: "bg-red-100 text-red-700" }[r] || "bg-slate-100";
-  },
-  gradeColor() { return { A: "#059669", B: "#10b981", C: "#f59e0b", D: "#dc2626" }[this.a?.result?.grade] || "#94a3b8"; },
-  dash() { const c = 2 * Math.PI * 50; return `${((this.a?.result?.score || 0) / 100) * c} ${c}`; },
+  statusClass(s) { return STATUS_CLASS[s] || "label-muted"; },
+  recClass(r) { return REC_CLASS[r] || "label-muted"; },
+  gradeFill() { return GRADE_FILL[this.a?.result?.grade] || "fill-muted"; },
   money(v) {
     if (v === null || v === undefined || v === "") return "—";
     return new Intl.NumberFormat(LOCALE[this.a?.customer?.country] || "en", { style: "currency", currency: this.a?.currency || "USD", maximumFractionDigits: 0 }).format(Number(v));
@@ -87,14 +85,14 @@ Alpine.data("consoleApp", () => ({
   },
   sourceTxns(sid) { return this.txns.filter((t) => t.source_id === sid); },
   rowClass(t) {
-    if (t.tampered) return "bg-red-50 text-red-800";
-    if (t.duplicate_of || t.kind === "internal_transfer") return "text-slate-400";
+    if (t.tampered) return "row-neg";
+    if (t.duplicate_of || t.kind === "internal_transfer") return "row-dim";
     return "";
   },
   rowNote(t, s) {
     if (t.tampered) {
       const f = s.tamper_flags.find((x) => x.row_index === t.row_index);
-      return `⚠ Balance mismatch — expected ${this.money(f?.expected_balance)}`;
+      return `Balance mismatch: expected ${this.money(f?.expected_balance)}`;
     }
     if (t.duplicate_of) return "Duplicate of a more trusted source";
     if (t.kind === "internal_transfer") return "Internal transfer (excluded)";
@@ -135,21 +133,24 @@ Alpine.data("consoleApp", () => ({
   highlight(key) {
     const el = document.getElementById(`metric-${key}`); if (!el) return;
     el.scrollIntoView({ behavior: "smooth", block: "center" });
-    el.classList.add("ring-4", "ring-indigo-400");
-    setTimeout(() => el.classList.remove("ring-4", "ring-indigo-400"), 1600);
+    el.classList.add("hl");
+    setTimeout(() => el.classList.remove("hl"), 1600);
   },
   drawChart() {
     const canvas = document.getElementById("cashflow-chart");
     if (!canvas || !this.a?.result || !window.Chart) return;
     if (chart) chart.destroy();
     const rows = this.a.result.metrics.monthly;
+    const axis = { grid: { color: "#EEF1F5" }, ticks: { color: "#667085", font: { size: 11 } } };
     chart = new window.Chart(canvas, {
       data: { labels: rows.map((r) => r.month), datasets: [
-        { type: "bar", label: "Inflow", data: rows.map((r) => Number(r.inflow)), backgroundColor: "#10b981" },
-        { type: "bar", label: "Outflow", data: rows.map((r) => Number(r.outflow)), backgroundColor: "#f43f5e" },
-        { type: "line", label: "Net", data: rows.map((r) => Number(r.net)), borderColor: "#1e293b", backgroundColor: "#1e293b", tension: 0.3 },
+        { type: "bar", label: "Inflow", data: rows.map((r) => Number(r.inflow)), backgroundColor: "#8CCFA8" },
+        { type: "bar", label: "Outflow", data: rows.map((r) => Number(r.outflow)), backgroundColor: "#F2A7A0" },
+        { type: "line", label: "Net", data: rows.map((r) => Number(r.net)), borderColor: "#3B6FB6", backgroundColor: "#3B6FB6", borderWidth: 1.5, pointRadius: 2, tension: 0 },
       ] },
-      options: { responsive: true, maintainAspectRatio: false, animation: false },
+      options: { responsive: true, maintainAspectRatio: false, animation: false,
+        plugins: { legend: { labels: { boxWidth: 10, color: "#344054", font: { size: 11 } } } },
+        scales: { x: axis, y: axis } },
     });
   },
 }));

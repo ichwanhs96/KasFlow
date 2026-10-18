@@ -35,3 +35,14 @@ def test_logo_and_favicon_served(client):
     assert r.status_code == 200 and "<svg" in r.text and "#4A7FC1" in r.text and "#3FA37A" in r.text
     f = client.get("/favicon.ico")
     assert f.status_code == 200 and f.headers["content-type"].startswith("image/svg+xml")
+
+
+def test_console_and_signin_use_the_design_system(client):
+    c = client.get("/console").text
+    assert 'class="topbar"' in c and 'src="/static/img/logo.svg"' in c and "x-html=\"icon(" in c
+    assert 'rel="icon" href="/static/img/logo.svg"' in c
+    i = client.get("/").text
+    assert 'class="topbar"' in i and "Sign in with Google" in i and 'rel="icon" href="/static/img/logo.svg"' in i
+    js = client.get("/static/js/console.js").text
+    assert 'from "/static/js/icons.js"' in js and "label-pos" in js
+    assert 'rel="icon" href="/static/img/logo.svg"' in client.get("/demo-login").text
