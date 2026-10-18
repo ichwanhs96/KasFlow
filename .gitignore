@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.env
+.env.deploy
+video/node_modules/
+video/out/
+video/*.mp4
+demo_assets/*.y4m
+scripts/fonts/
+hosting_public/*
+!hosting_public/.gitkeep
+.superpowers/
