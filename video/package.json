@@ -2,6 +2,6 @@
   "name": "kasflow-video",
   "private": true,
   "type": "module",
-  "scripts": { "record": "tsx record_demo.ts" },
+  "scripts": { "record": "tsx record_demo.ts", "check": "tsx check_pages.ts" },
   "devDependencies": { "@playwright/test": "1.48.2", "tsx": "4.19.2" }
 }
