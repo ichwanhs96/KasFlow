@@ -101,8 +101,6 @@ def test_no_background_polling_keeps_cloud_run_awake():
     # Cloud Run scales to zero; a forgotten browser tab must never keep an instance alive.
     for p in STATIC_DIR.rglob("*.js"):
         assert "setInterval" not in p.read_text(encoding="utf-8"), p.name
-    deploy = (ROOT / "deploy.sh").read_text(encoding="utf-8")
-    assert "--min-instances 0" in deploy and "--cpu-boost" in deploy
 
 
 def test_console_has_manual_refresh(client):

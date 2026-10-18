@@ -111,7 +111,7 @@ class StubGemini:
 
 
 class VertexGemini:
-    """Real Gemini on Vertex AI. Unit-tested with a fake client; verified live in Phase B (scripts/check_gemini.py)."""
+    """Real Gemini on Vertex AI. Unit-tested with a fake client; verified live against Vertex AI."""
 
     def __init__(self, settings: Settings, client=None, sleep=time.sleep, monotonic=time.monotonic) -> None:
         if client is None:

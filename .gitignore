@@ -13,3 +13,11 @@ hosting_public/*
 !hosting_public/.gitkeep
 .superpowers/
 .DS_Store
+
+# Local-only deploy tooling (kept on disk, not published)
+bootstrap.sh
+deploy.sh
+scripts/seed.py
+scripts/smoke.py
+scripts/check_gemini.py
+ACCESS.md

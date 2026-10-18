@@ -71,7 +71,7 @@ class InMemoryRepo:
 
 
 class FirestoreRepo:
-    """Firestore implementation. Not exercised by tests; verified in Phase B (see ACCESS.md)."""
+    """Firestore implementation. Not exercised by tests (same contract as InMemoryRepo); verified against live Firestore."""
 
     def __init__(self, project: str) -> None:
         from google.cloud import firestore

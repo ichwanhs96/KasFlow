@@ -69,4 +69,4 @@ Read this over `video/kasflow-demo.mp4` (3:20). Each part starts when its on-scr
 - Record each part as its own take so you can slide it onto the caption in the editor.
 - If a part runs long, cut the *[bracketed]* line first, then shorten the pause before the last sentence.
 - Part 9 is the longest scene (30 s). If you end early, let the AI-summary panel breathe on screen; don't fill the gap.
-- **Stub mode:** this local take was recorded in stub mode, so its AI-summary text is a placeholder that reads "stub summary, Gemini not called". After deploying with real Gemini (ACCESS.md, Phase B step 5), re-record the video for submission. The scene order is the same, so this script still fits; just recheck the timings against the new captions.
+- **Stub mode:** this local take was recorded in stub mode, so its AI-summary text is a placeholder that reads "stub summary, Gemini not called". After deploying with real Gemini, re-record the video for submission. The scene order is the same, so this script still fits; just recheck the timings against the new captions.
