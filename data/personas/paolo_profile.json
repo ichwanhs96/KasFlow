@@ -1,0 +1,15 @@
+{
+  "id": "paolo",
+  "label": "Paolo — Ride-hailing driver, Philippines (full open-finance data)",
+  "customer": {
+    "name": "Paolo Reyes",
+    "type": "individual",
+    "occupation_or_business_type": "Ride-hailing driver",
+    "country": "PH",
+    "years_active": 3
+  },
+  "consent_ref": "of-paolo-001",
+  "purpose": "loan",
+  "requested_amount": 80000,
+  "tenor_months": 6
+}

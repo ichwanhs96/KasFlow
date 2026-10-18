@@ -1,0 +1,15 @@
+{
+  "id": "sari",
+  "label": "Bu Sari — Warung, Indonesia (thin open-finance data)",
+  "customer": {
+    "name": "Sari Wulandari",
+    "type": "business",
+    "occupation_or_business_type": "Warung (grocery kiosk)",
+    "country": "ID",
+    "years_active": 6
+  },
+  "consent_ref": "of-sari-001",
+  "purpose": "loan",
+  "requested_amount": 50000000,
+  "tenor_months": 12
+}

@@ -1,0 +1,345 @@
+{
+  "provider": "openfinance-sea-sim",
+  "consent_ref": "of-sari-001",
+  "accounts": [
+    {
+      "account_id": "acc_4821",
+      "institution": "Bank Merapi",
+      "type": "bank",
+      "currency": "IDR",
+      "masked_number": "••4821",
+      "transactions": [
+        {
+          "txn_id": "t1",
+          "posted": "02/07/2026",
+          "amt": "2900000.00",
+          "cr_dr": "CR",
+          "narrative": "TRF DARI UD MAKMUR",
+          "category": "SALES",
+          "running_bal": "10900000.00",
+          "counterparty_name": "UD Makmur"
+        },
+        {
+          "txn_id": "t2",
+          "posted": "04/07/2026",
+          "amt": "1850000.00",
+          "cr_dr": "DR",
+          "narrative": "BAYAR SUPPLIER SEMBAKO",
+          "category": "OTHER",
+          "running_bal": "9050000.00",
+          "counterparty_name": "CV Sumber Pangan"
+        },
+        {
+          "txn_id": "t3",
+          "posted": "05/07/2026",
+          "amt": "400000.00",
+          "cr_dr": "DR",
+          "narrative": "ANGSURAN KOPERASI",
+          "category": "LOAN",
+          "running_bal": "8650000.00",
+          "counterparty_name": "Koperasi Sejahtera"
+        },
+        {
+          "txn_id": "t4",
+          "posted": "09/07/2026",
+          "amt": "2850000.00",
+          "cr_dr": "CR",
+          "narrative": "TRF DARI TOKO JAYA ABADI",
+          "category": "SALES",
+          "running_bal": "11500000.00",
+          "counterparty_name": "Toko Jaya Abadi"
+        },
+        {
+          "txn_id": "t5",
+          "posted": "11/07/2026",
+          "amt": "1500000.00",
+          "cr_dr": "DR",
+          "narrative": "BAYAR SUPPLIER SEMBAKO",
+          "category": "OTHER",
+          "running_bal": "10000000.00",
+          "counterparty_name": "CV Sumber Pangan"
+        },
+        {
+          "txn_id": "t6",
+          "posted": "16/07/2026",
+          "amt": "2350000.00",
+          "cr_dr": "CR",
+          "narrative": "TRF DARI UD MAKMUR",
+          "category": "SALES",
+          "running_bal": "12350000.00",
+          "counterparty_name": "UD Makmur"
+        },
+        {
+          "txn_id": "t7",
+          "posted": "18/07/2026",
+          "amt": "1600000.00",
+          "cr_dr": "DR",
+          "narrative": "BAYAR SUPPLIER SEMBAKO",
+          "category": "OTHER",
+          "running_bal": "10750000.00",
+          "counterparty_name": "CV Sumber Pangan"
+        },
+        {
+          "txn_id": "t8",
+          "posted": "23/07/2026",
+          "amt": "2900000.00",
+          "cr_dr": "CR",
+          "narrative": "TRF DARI TOKO JAYA ABADI",
+          "category": "SALES",
+          "running_bal": "13650000.00",
+          "counterparty_name": "Toko Jaya Abadi"
+        },
+        {
+          "txn_id": "t9",
+          "posted": "25/07/2026",
+          "amt": "2600000.00",
+          "cr_dr": "DR",
+          "narrative": "BAYAR SUPPLIER SEMBAKO",
+          "category": "OTHER",
+          "running_bal": "11050000.00",
+          "counterparty_name": "CV Sumber Pangan"
+        },
+        {
+          "txn_id": "t10",
+          "posted": "28/07/2026",
+          "amt": "2500000.00",
+          "cr_dr": "DR",
+          "narrative": "BAYAR SUPPLIER SEMBAKO",
+          "category": "OTHER",
+          "running_bal": "8550000.00",
+          "counterparty_name": "CV Sumber Pangan"
+        },
+        {
+          "txn_id": "t11",
+          "posted": "02/08/2026",
+          "amt": "2050000.00",
+          "cr_dr": "CR",
+          "narrative": "TRF DARI UD MAKMUR",
+          "category": "SALES",
+          "running_bal": "10600000.00",
+          "counterparty_name": "UD Makmur"
+        },
+        {
+          "txn_id": "t12",
+          "posted": "04/08/2026",
+          "amt": "1550000.00",
+          "cr_dr": "DR",
+          "narrative": "BAYAR SUPPLIER SEMBAKO",
+          "category": "OTHER",
+          "running_bal": "9050000.00",
+          "counterparty_name": "CV Sumber Pangan"
+        },
+        {
+          "txn_id": "t13",
+          "posted": "05/08/2026",
+          "amt": "400000.00",
+          "cr_dr": "DR",
+          "narrative": "ANGSURAN KOPERASI",
+          "category": "LOAN",
+          "running_bal": "8650000.00",
+          "counterparty_name": "Koperasi Sejahtera"
+        },
+        {
+          "txn_id": "t14",
+          "posted": "09/08/2026",
+          "amt": "2350000.00",
+          "cr_dr": "CR",
+          "narrative": "TRF DARI TOKO JAYA ABADI",
+          "category": "SALES",
+          "running_bal": "11000000.00",
+          "counterparty_name": "Toko Jaya Abadi"
+        },
+        {
+          "txn_id": "t15",
+          "posted": "11/08/2026",
+          "amt": "2000000.00",
+          "cr_dr": "DR",
+          "narrative": "BAYAR SUPPLIER SEMBAKO",
+          "category": "OTHER",
+          "running_bal": "9000000.00",
+          "counterparty_name": "CV Sumber Pangan"
+        },
+        {
+          "txn_id": "t16",
+          "posted": "14/08/2026",
+          "amt": "910000.00",
+          "cr_dr": "CR",
+          "narrative": "QRIS SETTLEMENT",
+          "category": "SALES",
+          "running_bal": "9910000.00",
+          "counterparty_name": null
+        },
+        {
+          "txn_id": "t17",
+          "posted": "16/08/2026",
+          "amt": "2100000.00",
+          "cr_dr": "CR",
+          "narrative": "TRF DARI UD MAKMUR",
+          "category": "SALES",
+          "running_bal": "12010000.00",
+          "counterparty_name": "UD Makmur"
+        },
+        {
+          "txn_id": "t18",
+          "posted": "18/08/2026",
+          "amt": "1600000.00",
+          "cr_dr": "DR",
+          "narrative": "BAYAR SUPPLIER SEMBAKO",
+          "category": "OTHER",
+          "running_bal": "10410000.00",
+          "counterparty_name": "CV Sumber Pangan"
+        },
+        {
+          "txn_id": "t19",
+          "posted": "23/08/2026",
+          "amt": "3400000.00",
+          "cr_dr": "CR",
+          "narrative": "TRF DARI TOKO JAYA ABADI",
+          "category": "SALES",
+          "running_bal": "13810000.00",
+          "counterparty_name": "Toko Jaya Abadi"
+        },
+        {
+          "txn_id": "t20",
+          "posted": "25/08/2026",
+          "amt": "2300000.00",
+          "cr_dr": "DR",
+          "narrative": "BAYAR SUPPLIER SEMBAKO",
+          "category": "OTHER",
+          "running_bal": "11510000.00",
+          "counterparty_name": "CV Sumber Pangan"
+        },
+        {
+          "txn_id": "t21",
+          "posted": "28/08/2026",
+          "amt": "1850000.00",
+          "cr_dr": "DR",
+          "narrative": "BAYAR SUPPLIER SEMBAKO",
+          "category": "OTHER",
+          "running_bal": "9660000.00",
+          "counterparty_name": "CV Sumber Pangan"
+        },
+        {
+          "txn_id": "t22",
+          "posted": "02/09/2026",
+          "amt": "2400000.00",
+          "cr_dr": "CR",
+          "narrative": "TRF DARI UD MAKMUR",
+          "category": "SALES",
+          "running_bal": "12060000.00",
+          "counterparty_name": "UD Makmur"
+        },
+        {
+          "txn_id": "t23",
+          "posted": "03/09/2026",
+          "amt": "500000.00",
+          "cr_dr": "DR",
+          "narrative": "TOPUP DOMPETKU",
+          "category": "TRANSFER",
+          "running_bal": "11560000.00",
+          "counterparty_name": "DompetKu"
+        },
+        {
+          "txn_id": "t24",
+          "posted": "04/09/2026",
+          "amt": "2350000.00",
+          "cr_dr": "DR",
+          "narrative": "BAYAR SUPPLIER SEMBAKO",
+          "category": "OTHER",
+          "running_bal": "9210000.00",
+          "counterparty_name": "CV Sumber Pangan"
+        },
+        {
+          "txn_id": "t25",
+          "posted": "05/09/2026",
+          "amt": "400000.00",
+          "cr_dr": "DR",
+          "narrative": "ANGSURAN KOPERASI",
+          "category": "LOAN",
+          "running_bal": "8810000.00",
+          "counterparty_name": "Koperasi Sejahtera"
+        },
+        {
+          "txn_id": "t26",
+          "posted": "09/09/2026",
+          "amt": "3050000.00",
+          "cr_dr": "CR",
+          "narrative": "TRF DARI TOKO JAYA ABADI",
+          "category": "SALES",
+          "running_bal": "11860000.00",
+          "counterparty_name": "Toko Jaya Abadi"
+        },
+        {
+          "txn_id": "t27",
+          "posted": "11/09/2026",
+          "amt": "1700000.00",
+          "cr_dr": "DR",
+          "narrative": "BAYAR SUPPLIER SEMBAKO",
+          "category": "OTHER",
+          "running_bal": "10160000.00",
+          "counterparty_name": "CV Sumber Pangan"
+        },
+        {
+          "txn_id": "t28",
+          "posted": "16/09/2026",
+          "amt": "2750000.00",
+          "cr_dr": "CR",
+          "narrative": "TRF DARI UD MAKMUR",
+          "category": "SALES",
+          "running_bal": "12910000.00",
+          "counterparty_name": "UD Makmur"
+        },
+        {
+          "txn_id": "t29",
+          "posted": "17/09/2026",
+          "amt": "500000.00",
+          "cr_dr": "DR",
+          "narrative": "TOPUP DOMPETKU",
+          "category": "TRANSFER",
+          "running_bal": "12410000.00",
+          "counterparty_name": "DompetKu"
+        },
+        {
+          "txn_id": "t30",
+          "posted": "18/09/2026",
+          "amt": "2650000.00",
+          "cr_dr": "DR",
+          "narrative": "BAYAR SUPPLIER SEMBAKO",
+          "category": "OTHER",
+          "running_bal": "9760000.00",
+          "counterparty_name": "CV Sumber Pangan"
+        },
+        {
+          "txn_id": "t31",
+          "posted": "23/09/2026",
+          "amt": "2300000.00",
+          "cr_dr": "CR",
+          "narrative": "TRF DARI TOKO JAYA ABADI",
+          "category": "SALES",
+          "running_bal": "12060000.00",
+          "counterparty_name": "Toko Jaya Abadi"
+        },
+        {
+          "txn_id": "t32",
+          "posted": "25/09/2026",
+          "amt": "2400000.00",
+          "cr_dr": "DR",
+          "narrative": "BAYAR SUPPLIER SEMBAKO",
+          "category": "OTHER",
+          "running_bal": "9660000.00",
+          "counterparty_name": "CV Sumber Pangan"
+        },
+        {
+          "txn_id": "t33",
+          "posted": "28/09/2026",
+          "amt": "2400000.00",
+          "cr_dr": "DR",
+          "narrative": "BAYAR SUPPLIER SEMBAKO",
+          "category": "OTHER",
+          "running_bal": "7260000.00",
+          "counterparty_name": "CV Sumber Pangan"
+        }
+      ]
+    }
+  ]
+}

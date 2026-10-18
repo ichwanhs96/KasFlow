@@ -1,0 +1,566 @@
+{
+  "document_type": "bank_statement",
+  "channel": "bank",
+  "institution": "Ngân hàng Sông Hồng",
+  "currency": "VND",
+  "rows": [
+    {
+      "date": "2026-04-05",
+      "description": "Thanh toán từ SÀN TMĐT SHOPMALL",
+      "amount": 29300000,
+      "direction": "in",
+      "balance": 179300000,
+      "counterparty": "SÀN TMĐT SHOPMALL",
+      "kind": "normal"
+    },
+    {
+      "date": "2026-04-06",
+      "description": "Nhập hàng từ xưởng may",
+      "amount": 35100000,
+      "direction": "out",
+      "balance": 144200000,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-04-08",
+      "description": "Chuyển khoản khách lẻ",
+      "amount": 15400000,
+      "direction": "in",
+      "balance": 159600000,
+      "counterparty": "Khách lẻ",
+      "kind": "normal"
+    },
+    {
+      "date": "2026-04-10",
+      "description": "Trả góp khoản vay kinh doanh",
+      "amount": 20000000,
+      "direction": "out",
+      "balance": 139600000,
+      "counterparty": "Ngân hàng Sông Hồng",
+      "kind": "loan_repayment"
+    },
+    {
+      "date": "2026-04-15",
+      "description": "Thanh toán từ SÀN TMĐT SHOPMALL",
+      "amount": 14600000,
+      "direction": "in",
+      "balance": 154200000,
+      "counterparty": "SÀN TMĐT SHOPMALL",
+      "kind": "normal"
+    },
+    {
+      "date": "2026-04-16",
+      "description": "Nhập hàng từ xưởng may",
+      "amount": 43000000,
+      "direction": "out",
+      "balance": 111200000,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-04-18",
+      "description": "Chuyển khoản khách lẻ",
+      "amount": 13000000,
+      "direction": "in",
+      "balance": 124200000,
+      "counterparty": "Khách lẻ",
+      "kind": "normal"
+    },
+    {
+      "date": "2026-04-25",
+      "description": "Thanh toán từ SÀN TMĐT SHOPMALL",
+      "amount": 28100000,
+      "direction": "in",
+      "balance": 152300000,
+      "counterparty": "SÀN TMĐT SHOPMALL",
+      "kind": "normal"
+    },
+    {
+      "date": "2026-04-26",
+      "description": "Nhập hàng từ xưởng may",
+      "amount": 39900000,
+      "direction": "out",
+      "balance": 112400000,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-04-28",
+      "description": "Chuyển khoản khách lẻ",
+      "amount": 19600000,
+      "direction": "in",
+      "balance": 132000000,
+      "counterparty": "Khách lẻ",
+      "kind": "normal"
+    },
+    {
+      "date": "2026-05-05",
+      "description": "Thanh toán từ SÀN TMĐT SHOPMALL",
+      "amount": 14700000,
+      "direction": "in",
+      "balance": 146700000,
+      "counterparty": "SÀN TMĐT SHOPMALL",
+      "kind": "normal"
+    },
+    {
+      "date": "2026-05-06",
+      "description": "Nhập hàng từ xưởng may",
+      "amount": 18300000,
+      "direction": "out",
+      "balance": 128400000,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-05-08",
+      "description": "Chuyển khoản khách lẻ",
+      "amount": 6200000,
+      "direction": "in",
+      "balance": 134600000,
+      "counterparty": "Khách lẻ",
+      "kind": "normal"
+    },
+    {
+      "date": "2026-05-10",
+      "description": "Trả góp khoản vay kinh doanh",
+      "amount": 20000000,
+      "direction": "out",
+      "balance": 114600000,
+      "counterparty": "Ngân hàng Sông Hồng",
+      "kind": "loan_repayment"
+    },
+    {
+      "date": "2026-05-15",
+      "description": "Thanh toán từ SÀN TMĐT SHOPMALL",
+      "amount": 12900000,
+      "direction": "in",
+      "balance": 127500000,
+      "counterparty": "SÀN TMĐT SHOPMALL",
+      "kind": "normal"
+    },
+    {
+      "date": "2026-05-16",
+      "description": "Nhập hàng từ xưởng may",
+      "amount": 18900000,
+      "direction": "out",
+      "balance": 108600000,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-05-18",
+      "description": "Chuyển khoản khách lẻ",
+      "amount": 8900000,
+      "direction": "in",
+      "balance": 117500000,
+      "counterparty": "Khách lẻ",
+      "kind": "normal"
+    },
+    {
+      "date": "2026-05-20",
+      "description": "Hoàn trả giao dịch không thành công",
+      "amount": 5000000,
+      "direction": "in",
+      "balance": 122500000,
+      "counterparty": null,
+      "kind": "returned"
+    },
+    {
+      "date": "2026-05-25",
+      "description": "Thanh toán từ SÀN TMĐT SHOPMALL",
+      "amount": 8400000,
+      "direction": "in",
+      "balance": 130900000,
+      "counterparty": "SÀN TMĐT SHOPMALL",
+      "kind": "normal"
+    },
+    {
+      "date": "2026-05-26",
+      "description": "Nhập hàng từ xưởng may",
+      "amount": 11800000,
+      "direction": "out",
+      "balance": 119100000,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-05-28",
+      "description": "Chuyển khoản khách lẻ",
+      "amount": 8900000,
+      "direction": "in",
+      "balance": 128000000,
+      "counterparty": "Khách lẻ",
+      "kind": "normal"
+    },
+    {
+      "date": "2026-06-05",
+      "description": "Thanh toán từ SÀN TMĐT SHOPMALL",
+      "amount": 32000000,
+      "direction": "in",
+      "balance": 160000000,
+      "counterparty": "SÀN TMĐT SHOPMALL",
+      "kind": "normal"
+    },
+    {
+      "date": "2026-06-06",
+      "description": "Nhập hàng từ xưởng may",
+      "amount": 38000000,
+      "direction": "out",
+      "balance": 122000000,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-06-08",
+      "description": "Chuyển khoản khách lẻ",
+      "amount": 15700000,
+      "direction": "in",
+      "balance": 137700000,
+      "counterparty": "Khách lẻ",
+      "kind": "normal"
+    },
+    {
+      "date": "2026-06-10",
+      "description": "Trả góp khoản vay kinh doanh",
+      "amount": 20000000,
+      "direction": "out",
+      "balance": 117700000,
+      "counterparty": "Ngân hàng Sông Hồng",
+      "kind": "loan_repayment"
+    },
+    {
+      "date": "2026-06-15",
+      "description": "Thanh toán từ SÀN TMĐT SHOPMALL",
+      "amount": 54400000,
+      "direction": "in",
+      "balance": 142100000,
+      "counterparty": "SÀN TMĐT SHOPMALL",
+      "kind": "normal"
+    },
+    {
+      "date": "2026-06-16",
+      "description": "Nhập hàng từ xưởng may",
+      "amount": 57200000,
+      "direction": "out",
+      "balance": 84900000,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-06-18",
+      "description": "Chuyển khoản khách lẻ",
+      "amount": 21100000,
+      "direction": "in",
+      "balance": 106000000,
+      "counterparty": "Khách lẻ",
+      "kind": "normal"
+    },
+    {
+      "date": "2026-06-25",
+      "description": "Thanh toán từ SÀN TMĐT SHOPMALL",
+      "amount": 27600000,
+      "direction": "in",
+      "balance": 133600000,
+      "counterparty": "SÀN TMĐT SHOPMALL",
+      "kind": "normal"
+    },
+    {
+      "date": "2026-06-26",
+      "description": "Nhập hàng từ xưởng may",
+      "amount": 45800000,
+      "direction": "out",
+      "balance": 87800000,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-06-28",
+      "description": "Chuyển khoản khách lẻ",
+      "amount": 19200000,
+      "direction": "in",
+      "balance": 107000000,
+      "counterparty": "Khách lẻ",
+      "kind": "normal"
+    },
+    {
+      "date": "2026-07-05",
+      "description": "Thanh toán từ SÀN TMĐT SHOPMALL",
+      "amount": 12000000,
+      "direction": "in",
+      "balance": 119000000,
+      "counterparty": "SÀN TMĐT SHOPMALL",
+      "kind": "normal"
+    },
+    {
+      "date": "2026-07-06",
+      "description": "Nhập hàng từ xưởng may",
+      "amount": 9300000,
+      "direction": "out",
+      "balance": 109700000,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-07-08",
+      "description": "Chuyển khoản khách lẻ",
+      "amount": 6000000,
+      "direction": "in",
+      "balance": 115700000,
+      "counterparty": "Khách lẻ",
+      "kind": "normal"
+    },
+    {
+      "date": "2026-07-10",
+      "description": "Trả góp khoản vay kinh doanh",
+      "amount": 20000000,
+      "direction": "out",
+      "balance": 95700000,
+      "counterparty": "Ngân hàng Sông Hồng",
+      "kind": "loan_repayment"
+    },
+    {
+      "date": "2026-07-15",
+      "description": "Thanh toán từ SÀN TMĐT SHOPMALL",
+      "amount": 7400000,
+      "direction": "in",
+      "balance": 103100000,
+      "counterparty": "SÀN TMĐT SHOPMALL",
+      "kind": "normal"
+    },
+    {
+      "date": "2026-07-16",
+      "description": "Nhập hàng từ xưởng may",
+      "amount": 14900000,
+      "direction": "out",
+      "balance": 88200000,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-07-18",
+      "description": "Chuyển khoản khách lẻ",
+      "amount": 8300000,
+      "direction": "in",
+      "balance": 96500000,
+      "counterparty": "Khách lẻ",
+      "kind": "normal"
+    },
+    {
+      "date": "2026-07-25",
+      "description": "Thanh toán từ SÀN TMĐT SHOPMALL",
+      "amount": 10600000,
+      "direction": "in",
+      "balance": 107100000,
+      "counterparty": "SÀN TMĐT SHOPMALL",
+      "kind": "normal"
+    },
+    {
+      "date": "2026-07-26",
+      "description": "Nhập hàng từ xưởng may",
+      "amount": 13200000,
+      "direction": "out",
+      "balance": 93900000,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-07-28",
+      "description": "Chuyển khoản khách lẻ",
+      "amount": 5700000,
+      "direction": "in",
+      "balance": 99600000,
+      "counterparty": "Khách lẻ",
+      "kind": "normal"
+    },
+    {
+      "date": "2026-08-05",
+      "description": "Thanh toán từ SÀN TMĐT SHOPMALL",
+      "amount": 15600000,
+      "direction": "in",
+      "balance": 115200000,
+      "counterparty": "SÀN TMĐT SHOPMALL",
+      "kind": "normal"
+    },
+    {
+      "date": "2026-08-06",
+      "description": "Nhập hàng từ xưởng may",
+      "amount": 31500000,
+      "direction": "out",
+      "balance": 83700000,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-08-08",
+      "description": "Chuyển khoản khách lẻ",
+      "amount": 10000000,
+      "direction": "in",
+      "balance": 93700000,
+      "counterparty": "Khách lẻ",
+      "kind": "normal"
+    },
+    {
+      "date": "2026-08-10",
+      "description": "Trả góp khoản vay kinh doanh",
+      "amount": 20000000,
+      "direction": "out",
+      "balance": 73700000,
+      "counterparty": "Ngân hàng Sông Hồng",
+      "kind": "loan_repayment"
+    },
+    {
+      "date": "2026-08-15",
+      "description": "Thanh toán từ SÀN TMĐT SHOPMALL",
+      "amount": 47400000,
+      "direction": "in",
+      "balance": 91100000,
+      "counterparty": "SÀN TMĐT SHOPMALL",
+      "kind": "normal"
+    },
+    {
+      "date": "2026-08-16",
+      "description": "Nhập hàng từ xưởng may",
+      "amount": 29900000,
+      "direction": "out",
+      "balance": 61200000,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-08-18",
+      "description": "Chuyển khoản khách lẻ",
+      "amount": 12300000,
+      "direction": "in",
+      "balance": 73500000,
+      "counterparty": "Khách lẻ",
+      "kind": "normal"
+    },
+    {
+      "date": "2026-08-20",
+      "description": "Hoàn trả giao dịch không thành công",
+      "amount": 5000000,
+      "direction": "in",
+      "balance": 78500000,
+      "counterparty": null,
+      "kind": "returned"
+    },
+    {
+      "date": "2026-08-25",
+      "description": "Thanh toán từ SÀN TMĐT SHOPMALL",
+      "amount": 21000000,
+      "direction": "in",
+      "balance": 99500000,
+      "counterparty": "SÀN TMĐT SHOPMALL",
+      "kind": "normal"
+    },
+    {
+      "date": "2026-08-26",
+      "description": "Nhập hàng từ xưởng may",
+      "amount": 22000000,
+      "direction": "out",
+      "balance": 77500000,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-08-28",
+      "description": "Chuyển khoản khách lẻ",
+      "amount": 13700000,
+      "direction": "in",
+      "balance": 91200000,
+      "counterparty": "Khách lẻ",
+      "kind": "normal"
+    },
+    {
+      "date": "2026-09-05",
+      "description": "Thanh toán từ SÀN TMĐT SHOPMALL",
+      "amount": 10500000,
+      "direction": "in",
+      "balance": 101700000,
+      "counterparty": "SÀN TMĐT SHOPMALL",
+      "kind": "normal"
+    },
+    {
+      "date": "2026-09-06",
+      "description": "Nhập hàng từ xưởng may",
+      "amount": 15100000,
+      "direction": "out",
+      "balance": 86600000,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-09-08",
+      "description": "Chuyển khoản khách lẻ",
+      "amount": 8100000,
+      "direction": "in",
+      "balance": 94700000,
+      "counterparty": "Khách lẻ",
+      "kind": "normal"
+    },
+    {
+      "date": "2026-09-10",
+      "description": "Trả góp khoản vay kinh doanh",
+      "amount": 20000000,
+      "direction": "out",
+      "balance": 74700000,
+      "counterparty": "Ngân hàng Sông Hồng",
+      "kind": "loan_repayment"
+    },
+    {
+      "date": "2026-09-15",
+      "description": "Thanh toán từ SÀN TMĐT SHOPMALL",
+      "amount": 10100000,
+      "direction": "in",
+      "balance": 84800000,
+      "counterparty": "SÀN TMĐT SHOPMALL",
+      "kind": "normal"
+    },
+    {
+      "date": "2026-09-16",
+      "description": "Nhập hàng từ xưởng may",
+      "amount": 8700000,
+      "direction": "out",
+      "balance": 76100000,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-09-18",
+      "description": "Chuyển khoản khách lẻ",
+      "amount": 4700000,
+      "direction": "in",
+      "balance": 80800000,
+      "counterparty": "Khách lẻ",
+      "kind": "normal"
+    },
+    {
+      "date": "2026-09-25",
+      "description": "Thanh toán từ SÀN TMĐT SHOPMALL",
+      "amount": 6400000,
+      "direction": "in",
+      "balance": 87200000,
+      "counterparty": "SÀN TMĐT SHOPMALL",
+      "kind": "normal"
+    },
+    {
+      "date": "2026-09-26",
+      "description": "Nhập hàng từ xưởng may",
+      "amount": 7900000,
+      "direction": "out",
+      "balance": 79300000,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-09-28",
+      "description": "Chuyển khoản khách lẻ",
+      "amount": 5200000,
+      "direction": "in",
+      "balance": 84500000,
+      "counterparty": "Khách lẻ",
+      "kind": "normal"
+    }
+  ]
+}

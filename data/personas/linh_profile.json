@@ -1,0 +1,15 @@
+{
+  "id": "linh",
+  "label": "Linh — Online shop, Vietnam (thin open-finance data)",
+  "customer": {
+    "name": "Nguyễn Thị Linh",
+    "type": "business",
+    "occupation_or_business_type": "Online fashion shop",
+    "country": "VN",
+    "years_active": 2
+  },
+  "consent_ref": "of-linh-001",
+  "purpose": "loan",
+  "requested_amount": 150000000,
+  "tenor_months": 12
+}

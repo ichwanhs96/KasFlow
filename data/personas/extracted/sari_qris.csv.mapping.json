@@ -1,0 +1,19 @@
+{
+  "date_column": "Tgl Transaksi",
+  "date_format": "%d-%m-%Y",
+  "amount_column": "Nominal (Rp)",
+  "debit_column": null,
+  "credit_column": null,
+  "direction_column": null,
+  "direction_in_values": [],
+  "description_column": "Keterangan",
+  "balance_column": null,
+  "counterparty_column": null,
+  "thousands_separator": ".",
+  "decimal_separator": ",",
+  "channel": "qris",
+  "status_column": "Status",
+  "success_values": [
+    "BERHASIL"
+  ]
+}

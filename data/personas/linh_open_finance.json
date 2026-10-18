@@ -1,0 +1,115 @@
+{
+  "provider": "openfinance-sea-sim",
+  "consent_ref": "of-linh-001",
+  "accounts": [
+    {
+      "account_id": "acc_5502",
+      "institution": "ViMo",
+      "type": "ewallet",
+      "currency": "VND",
+      "masked_number": "••5502",
+      "transactions": [
+        {
+          "txn_id": "t1",
+          "posted": "03/08/2026",
+          "amt": "2910000.00",
+          "cr_dr": "CR",
+          "narrative": "Nhận tiền từ khách",
+          "category": "SALES",
+          "running_bal": "22910000.00",
+          "counterparty_name": null
+        },
+        {
+          "txn_id": "t2",
+          "posted": "08/08/2026",
+          "amt": "1090000.00",
+          "cr_dr": "DR",
+          "narrative": "Thanh toán phí vận chuyển",
+          "category": "OTHER",
+          "running_bal": "21820000.00",
+          "counterparty_name": null
+        },
+        {
+          "txn_id": "t3",
+          "posted": "12/08/2026",
+          "amt": "4970000.00",
+          "cr_dr": "CR",
+          "narrative": "Nhận tiền từ khách",
+          "category": "SALES",
+          "running_bal": "26790000.00",
+          "counterparty_name": null
+        },
+        {
+          "txn_id": "t4",
+          "posted": "22/08/2026",
+          "amt": "3350000.00",
+          "cr_dr": "CR",
+          "narrative": "Nhận tiền từ khách",
+          "category": "SALES",
+          "running_bal": "30140000.00",
+          "counterparty_name": null
+        },
+        {
+          "txn_id": "t5",
+          "posted": "25/08/2026",
+          "amt": "1270000.00",
+          "cr_dr": "DR",
+          "narrative": "Thanh toán phí vận chuyển",
+          "category": "OTHER",
+          "running_bal": "28870000.00",
+          "counterparty_name": null
+        },
+        {
+          "txn_id": "t6",
+          "posted": "03/09/2026",
+          "amt": "4220000.00",
+          "cr_dr": "CR",
+          "narrative": "Nhận tiền từ khách",
+          "category": "SALES",
+          "running_bal": "33090000.00",
+          "counterparty_name": null
+        },
+        {
+          "txn_id": "t7",
+          "posted": "08/09/2026",
+          "amt": "2110000.00",
+          "cr_dr": "DR",
+          "narrative": "Thanh toán phí vận chuyển",
+          "category": "OTHER",
+          "running_bal": "30980000.00",
+          "counterparty_name": null
+        },
+        {
+          "txn_id": "t8",
+          "posted": "12/09/2026",
+          "amt": "3760000.00",
+          "cr_dr": "CR",
+          "narrative": "Nhận tiền từ khách",
+          "category": "SALES",
+          "running_bal": "34740000.00",
+          "counterparty_name": null
+        },
+        {
+          "txn_id": "t9",
+          "posted": "22/09/2026",
+          "amt": "3600000.00",
+          "cr_dr": "CR",
+          "narrative": "Nhận tiền từ khách",
+          "category": "SALES",
+          "running_bal": "38340000.00",
+          "counterparty_name": null
+        },
+        {
+          "txn_id": "t10",
+          "posted": "25/09/2026",
+          "amt": "2550000.00",
+          "cr_dr": "DR",
+          "narrative": "Thanh toán phí vận chuyển",
+          "category": "OTHER",
+          "running_bal": "35790000.00",
+          "counterparty_name": null
+        }
+      ]
+    }
+  ]
+}

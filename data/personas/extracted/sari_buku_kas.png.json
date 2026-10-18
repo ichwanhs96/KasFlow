@@ -1,0 +1,170 @@
+{
+  "document_type": "cash_ledger",
+  "channel": "cash",
+  "institution": null,
+  "currency": "IDR",
+  "rows": [
+    {
+      "date": "2026-09-01",
+      "description": "Jual beras 5kg",
+      "amount": 65000,
+      "direction": "in",
+      "balance": null,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-09-03",
+      "description": "Jual minyak goreng",
+      "amount": 80000,
+      "direction": "in",
+      "balance": null,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-09-03",
+      "description": "Beli gas elpiji",
+      "amount": 25000,
+      "direction": "out",
+      "balance": null,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-09-05",
+      "description": "Jual gula 2kg",
+      "amount": 65000,
+      "direction": "in",
+      "balance": null,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-09-05",
+      "description": "Cicilan koperasi",
+      "amount": 400000,
+      "direction": "out",
+      "balance": null,
+      "counterparty": null,
+      "kind": "loan_repayment"
+    },
+    {
+      "date": "2026-09-07",
+      "description": "Jual telur 1 rak",
+      "amount": 175000,
+      "direction": "in",
+      "balance": null,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-09-08",
+      "description": "Beli plastik",
+      "amount": 15000,
+      "direction": "out",
+      "balance": null,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-09-09",
+      "description": "Jual mi instan 1 dus",
+      "amount": 155000,
+      "direction": "in",
+      "balance": null,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-09-11",
+      "description": "Jual kopi sachet",
+      "amount": 80000,
+      "direction": "in",
+      "balance": null,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-09-13",
+      "description": "Jual sabun",
+      "amount": 125000,
+      "direction": "in",
+      "balance": null,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-09-14",
+      "description": "Bayar listrik toko",
+      "amount": 150000,
+      "direction": "out",
+      "balance": null,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-09-15",
+      "description": "Jual rokok",
+      "amount": 110000,
+      "direction": "in",
+      "balance": null,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-09-17",
+      "description": "Jual gas elpiji",
+      "amount": 110000,
+      "direction": "in",
+      "balance": null,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-09-19",
+      "description": "Jual air galon",
+      "amount": 220000,
+      "direction": "in",
+      "balance": null,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-09-19",
+      "description": "Beli es batu",
+      "amount": 10000,
+      "direction": "out",
+      "balance": null,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-09-21",
+      "description": "Jual tepung",
+      "amount": 190000,
+      "direction": "in",
+      "balance": null,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-09-23",
+      "description": "Jual susu kaleng",
+      "amount": 90000,
+      "direction": "in",
+      "balance": null,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-09-25",
+      "description": "Ongkos angkut",
+      "amount": 30000,
+      "direction": "out",
+      "balance": null,
+      "counterparty": null,
+      "kind": "normal"
+    }
+  ]
+}

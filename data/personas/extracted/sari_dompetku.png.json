@@ -1,0 +1,134 @@
+{
+  "document_type": "ewallet_history",
+  "channel": "ewallet",
+  "institution": "DompetKu",
+  "currency": "IDR",
+  "rows": [
+    {
+      "date": "2026-09-27",
+      "description": "Beli pulsa",
+      "amount": 141000,
+      "direction": "out",
+      "balance": null,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-09-26",
+      "description": "Terima pembayaran",
+      "amount": 46000,
+      "direction": "in",
+      "balance": null,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-09-21",
+      "description": "Terima pembayaran",
+      "amount": 46000,
+      "direction": "in",
+      "balance": null,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-09-20",
+      "description": "Bayar internet",
+      "amount": 126000,
+      "direction": "out",
+      "balance": null,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-09-18",
+      "description": "Isi saldo dari Bank Merapi",
+      "amount": 500000,
+      "direction": "in",
+      "balance": null,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-09-15",
+      "description": "Bayar air",
+      "amount": 129000,
+      "direction": "out",
+      "balance": null,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-09-14",
+      "description": "Terima pembayaran",
+      "amount": 69000,
+      "direction": "in",
+      "balance": null,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-09-12",
+      "description": "Terima pembayaran",
+      "amount": 126000,
+      "direction": "in",
+      "balance": null,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-09-10",
+      "description": "Beli pulsa",
+      "amount": 111000,
+      "direction": "out",
+      "balance": null,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-09-08",
+      "description": "Terima pembayaran",
+      "amount": 142000,
+      "direction": "in",
+      "balance": null,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-09-06",
+      "description": "Terima pembayaran",
+      "amount": 83000,
+      "direction": "in",
+      "balance": null,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-09-03",
+      "description": "Isi saldo dari Bank Merapi",
+      "amount": 500000,
+      "direction": "in",
+      "balance": null,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-09-02",
+      "description": "Bayar listrik",
+      "amount": 131000,
+      "direction": "out",
+      "balance": null,
+      "counterparty": null,
+      "kind": "normal"
+    },
+    {
+      "date": "2026-09-01",
+      "description": "Terima pembayaran",
+      "amount": 142000,
+      "direction": "in",
+      "balance": null,
+      "counterparty": null,
+      "kind": "normal"
+    }
+  ]
+}
