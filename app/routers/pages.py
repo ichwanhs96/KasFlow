@@ -16,6 +16,11 @@ def index():
     return _page("index.html")
 
 
+@router.get("/favicon.ico")
+def favicon():
+    return FileResponse(STATIC_DIR / "img" / "logo.svg", media_type="image/svg+xml")
+
+
 @router.get("/console")
 def console():
     return _page("console.html")
